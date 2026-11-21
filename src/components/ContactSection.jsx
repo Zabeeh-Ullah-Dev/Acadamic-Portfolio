@@ -92,7 +92,7 @@ export function ContactSection() {
     'w-full rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3 text-sm text-[#F3F5F8] placeholder:text-[#8B95A5] transition-colors focus:border-[#3B82F6] focus:bg-[#141922] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30';
 
   return (
-      <section id="contact" className="bg-[#0C0F14] py-20 sm:py-24">
+      <section id="contact" className="section-defer bg-[#0C0F14] py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <p className="font-mono text-xs font-medium text-[#60A5FA]">
@@ -253,7 +253,7 @@ export function ContactSection() {
                           aria-describedby={
                             formErrors.name ? 'contact-name-error' : undefined
                           }
-                          placeholder="Dr. Elena Rostova"
+                          placeholder="Full Name"
                           className={`${inputBaseClass} mt-1.5 ${
                             formErrors.name ? 'border-red-400/70' : ''
                           }`}
@@ -584,13 +584,13 @@ export function ContactSection() {
 
                     <button
                       type="submit"
-                      className="group inline-flex min-h-[44px] items-center justify-center gap-2.5 rounded-xl border border-[#3B82F6]/70 bg-gradient-to-br from-[#172554]/95 via-[#1E3A8A]/85 to-[#0F172A]/95 py-2 pl-2.5 pr-4 text-sm font-semibold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(147,197,253,0.28),0_8px_20px_-6px_rgba(37,99,235,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#93C5FD] hover:from-[#2563EB] hover:via-[#1D4ED8] hover:to-[#1E40AF] hover:text-white whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+                      className="hover-sheen group inline-flex min-h-[44px] items-center justify-center gap-2.5 rounded-xl border border-[#3B82F6]/70 bg-gradient-to-br from-[#172554]/95 via-[#1E3A8A]/85 to-[#0F172A]/95 py-2 pl-2.5 pr-4 text-sm font-semibold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(147,197,253,0.28),0_8px_20px_-6px_rgba(37,99,235,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#93C5FD] hover:from-[#2563EB] hover:via-[#1D4ED8] hover:to-[#1E40AF] hover:text-white active:scale-[0.98] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
                     >
                       <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#60A5FA]/40 bg-[#2563EB]/30 text-[#93C5FD] transition-colors group-hover:border-white/30 group-hover:bg-white/15 group-hover:text-white">
-                        <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                        <Send className="icon-send-launch h-3.5 w-3.5" aria-hidden="true" />
                       </span>
                       <span>Prepare &amp; Send Inquiry</span>
-                      <ArrowUpRight className="h-4 w-4 text-[#60A5FA] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" aria-hidden="true" />
+                      <ArrowUpRight className="icon-nudge-ne h-4 w-4 text-[#60A5FA] group-hover:text-white" aria-hidden="true" />
                     </button>
                   </div>
                 </form>
@@ -612,9 +612,9 @@ export function ContactSection() {
                     <div className="mt-1.5 flex items-center justify-between gap-2">
                       <a
                         href={`mailto:${PROFILE_INFO.emails.academic}`}
-                        className="inline-flex min-w-0 items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] hover:text-[#60A5FA]"
+                        className="group inline-flex min-w-0 items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] transition-colors hover:text-[#60A5FA]"
                       >
-                        <Mail className="h-4 w-4 shrink-0 text-[#3B82F6]" />
+                        <Mail className="icon-spring h-4 w-4 shrink-0 text-[#3B82F6]" />
                         <span className="truncate">{PROFILE_INFO.emails.academic}</span>
                       </a>
                       <button
@@ -623,16 +623,16 @@ export function ContactSection() {
                           handleCopy('academic-email', PROFILE_INFO.emails.academic)
                         }
                         aria-label={`Copy institutional email ${PROFILE_INFO.emails.academic}`}
-                        className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-[#F3F5F8] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap shrink-0"
+                        className="group inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-[#F3F5F8] transition-all hover:-translate-y-0.5 hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap shrink-0"
                       >
                         {copiedKey === 'academic-email' ? (
                           <>
-                            <Check className="h-3.5 w-3.5 text-[#60A5FA]" />
-                            <span>Copied</span>
+                            <Check className="animate-check-pop h-3.5 w-3.5 text-emerald-400" />
+                            <span className="text-emerald-300">Copied</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="h-3.5 w-3.5" />
+                            <Copy className="icon-spring h-3.5 w-3.5" />
                             <span>Copy</span>
                           </>
                         )}
@@ -649,9 +649,9 @@ export function ContactSection() {
                     <div className="mt-1.5 flex items-center justify-between gap-2">
                       <a
                         href={`mailto:${PROFILE_INFO.emails.personal}`}
-                        className="inline-flex min-w-0 items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] hover:text-[#60A5FA]"
+                        className="group inline-flex min-w-0 items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] transition-colors hover:text-[#60A5FA]"
                       >
-                        <Mail className="h-4 w-4 shrink-0 text-[#3B82F6]" />
+                        <Mail className="icon-spring h-4 w-4 shrink-0 text-[#3B82F6]" />
                         <span className="truncate">{PROFILE_INFO.emails.personal}</span>
                       </a>
                       <button
@@ -660,16 +660,16 @@ export function ContactSection() {
                           handleCopy('personal-email', PROFILE_INFO.emails.personal)
                         }
                         aria-label={`Copy personal email ${PROFILE_INFO.emails.personal}`}
-                        className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-[#F3F5F8] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap shrink-0"
+                        className="group inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-[#F3F5F8] transition-all hover:-translate-y-0.5 hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap shrink-0"
                       >
                         {copiedKey === 'personal-email' ? (
                           <>
-                            <Check className="h-3.5 w-3.5 text-[#60A5FA]" />
-                            <span>Copied</span>
+                            <Check className="animate-check-pop h-3.5 w-3.5 text-emerald-400" />
+                            <span className="text-emerald-300">Copied</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="h-3.5 w-3.5" />
+                            <Copy className="icon-spring h-3.5 w-3.5" />
                             <span>Copy</span>
                           </>
                         )}
@@ -685,9 +685,9 @@ export function ContactSection() {
                     </p>
                     <a
                       href={`tel:${PROFILE_INFO.phone}`}
-                      className="mt-1.5 inline-flex items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] hover:text-[#60A5FA]"
+                      className="group mt-1.5 inline-flex items-center gap-2 font-mono text-sm font-medium text-[#F3F5F8] transition-colors hover:text-[#60A5FA]"
                     >
-                      <Phone className="h-4 w-4 text-[#3B82F6]" />
+                      <Phone className="icon-spring h-4 w-4 text-[#3B82F6]" />
                       <span>{PROFILE_INFO.phone}</span>
                     </a>
                   </div>
@@ -741,11 +741,11 @@ export function ContactSection() {
                   <div>
                     <a
                       href={`mailto:${ref.email}`}
-                      className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.03] px-3.5 py-2 font-mono text-xs font-medium text-[#60A5FA] transition-colors hover:border-[#3B82F6] hover:bg-[#2563EB]/15 hover:text-[#93C5FD]"
+                      className="group inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.03] px-3.5 py-2 font-mono text-xs font-medium text-[#60A5FA] transition-all hover:-translate-y-0.5 hover:border-[#3B82F6] hover:bg-[#2563EB]/15 hover:text-[#93C5FD]"
                     >
-                      <Mail className="h-3.5 w-3.5 shrink-0" />
+                      <Mail className="icon-spring h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">{ref.email}</span>
-                      <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
+                      <ArrowUpRight className="icon-nudge-ne h-3.5 w-3.5 shrink-0" />
                     </a>
                   </div>
                 </article>

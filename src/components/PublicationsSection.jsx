@@ -1,19 +1,18 @@
-import { useState } from 'react';
 import {
-  Search,
   ArrowUpRight,
   RotateCcw,
-  ChevronDown,
-  ChevronUp,
-  Layers,
+  ExternalLink,
 } from 'lucide-react';
-import { PUBLICATIONS } from '../data/portfolioData';
+import { PROFILE_INFO, PUBLICATIONS } from '../data/portfolioData';
 import {
   filterAndSortPublications,
   getCategoryCounts,
   getCodeBackedCount,
+  getVisiblePublications,
+  isPublicationFilterActive,
 } from '../utils/publicationsFilter';
-import { GitHubIcon } from './BrandIcons';
+import { GitHubIcon, GoogleScholarIcon } from './BrandIcons';
+import { ExpandableSearch } from './ExpandableSearch';
 import { PublicationSchematic } from './PublicationSchematic';
 
 const INITIAL_VISIBLE_COUNT = 2;
@@ -23,15 +22,15 @@ export function PublicationsSection({
   searchQuery,
   sortMode,
   onlyWithCode,
+  focusedPublicationId = null,
   onCategoryChange,
   onSearchChange,
   onSortChange,
   onToggleOnlyWithCode,
+  onClearFocusedPublication,
   onResetFilters,
   onSelectPublication,
 }) {
-  const [showAll, setShowAll] = useState(false);
-
   const counts = getCategoryCounts(PUBLICATIONS);
   const codeCount = getCodeBackedCount(PUBLICATIONS);
   const filtered = filterAndSortPublications(PUBLICATIONS, {
@@ -41,12 +40,20 @@ export function PublicationsSection({
     onlyWithCode,
   });
 
-  const isSearchOrCodeActive = searchQuery.trim() !== '' || onlyWithCode;
-  const shouldExpandAll = showAll || isSearchOrCodeActive;
-  const visiblePublications = shouldExpandAll
-    ? filtered
-    : filtered.slice(0, INITIAL_VISIBLE_COUNT);
-  const remainingCount = Math.max(0, filtered.length - visiblePublications.length);
+  const filterActive = isPublicationFilterActive({
+    category,
+    searchQuery,
+    onlyWithCode,
+    focusedPublicationId,
+  });
+
+  const visiblePublications = getVisiblePublications(filtered, {
+    category,
+    searchQuery,
+    onlyWithCode,
+    focusedPublicationId,
+    initialLimit: INITIAL_VISIBLE_COUNT,
+  });
 
   const tabs = [
     { id: 'all', label: 'All Publications', count: counts.all },
@@ -63,11 +70,7 @@ export function PublicationsSection({
     },
   ];
 
-  const hasActiveFilters =
-    category !== 'all' || searchQuery.trim() !== '' || onlyWithCode;
-
   const handleResetAll = () => {
-    setShowAll(false);
     onResetFilters();
   };
 
@@ -86,7 +89,7 @@ export function PublicationsSection({
               Publications &amp; Code Archive
             </h2>
             <p className="mt-3 text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
-              Complete record of {PUBLICATIONS.length} papers and chapters (2020–2026), with direct GitHub code links on flagship implementations and 1-click BibTeX export.
+              Highlighting the 2 most recent papers below — search or apply any category filter to browse all {PUBLICATIONS.length} peer-reviewed publications (2020–2026) with exact paper diagrams, core ideas, publisher info, and Google Scholar links.
             </p>
           </div>
 
@@ -106,34 +109,16 @@ export function PublicationsSection({
           </div>
         </div>
 
-        {/* Search, Category Tabs & GitHub Code Toggle */}
-        <div className="mt-8 space-y-4">
-          <div className="relative">
-            <label htmlFor="publication-search" className="sr-only">
-              Search publications by title, venue, year, or keyword
-            </label>
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8B95A5]"
-            />
-            <input
-              id="publication-search"
-              type="search"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search by title, venue (e.g., PAKDD, ACL, Physica A), year, or keyword..."
-              className="w-full rounded-xl border border-white/15 bg-white/[0.03] py-3.5 pl-11 pr-4 text-sm text-[#F3F5F8] placeholder:text-[#8B95A5] focus:border-[#3B82F6] focus:bg-[#141922] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]/30"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Category Tabs, GitHub Code Toggle & Right-Side Expandable Search Icon */}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <div
               role="tablist"
               aria-label="Publication category filters"
               className="flex flex-wrap items-center gap-2"
             >
               {tabs.map((tab) => {
-                const isActive = category === tab.id;
+                const isActive = !focusedPublicationId && category === tab.id;
                 return (
                   <button
                     key={tab.id}
@@ -170,27 +155,42 @@ export function PublicationsSection({
               <span>GitHub Code ({codeCount})</span>
             </button>
           </div>
+
+          <div className="ml-auto flex w-full justify-end sm:w-auto">
+            <ExpandableSearch
+              id="publication-search"
+              value={searchQuery}
+              onChange={onSearchChange}
+              placeholder="Search 32 papers by title, venue, year..."
+              ariaLabel="Search publications by title, venue, publisher, year, or keyword"
+              buttonLabel="Search publications"
+              testIdPrefix="pub-search"
+            />
+          </div>
         </div>
 
         {/* Result Status Line */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-xs text-[#8B95A5]">
           <p data-testid="publications-count" className="font-mono tabular-nums">
-            Showing {visiblePublications.length} of {filtered.length} publications
-            {filtered.length !== PUBLICATIONS.length ? ` (${PUBLICATIONS.length} total)` : ''}
+            {focusedPublicationId
+              ? `Focused exact paper from spotlight (${PUBLICATIONS.length} total archive)`
+              : filterActive
+                ? `Showing all ${visiblePublications.length} matching publications (${PUBLICATIONS.length} total)`
+                : `Showing ${visiblePublications.length} recent publications (${PUBLICATIONS.length} total)`}
           </p>
-          {hasActiveFilters && (
+          {filterActive && (
             <button
               type="button"
-              onClick={handleResetAll}
+              onClick={focusedPublicationId ? onClearFocusedPublication || handleResetAll : handleResetAll}
               className="inline-flex items-center gap-1 font-medium text-[#60A5FA] hover:text-[#93C5FD] focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Reset filters</span>
+              <span>{focusedPublicationId ? 'Show recent papers' : 'Reset filters'}</span>
             </button>
           )}
         </div>
 
-        {/* Publications 2-Column Architectural Grid or Empty State */}
+        {/* Publications Grid, Focused Spotlight Paper Card, or Empty State */}
         {filtered.length === 0 ? (
           <div
             data-testid="publications-empty"
@@ -217,56 +217,216 @@ export function PublicationsSection({
               data-testid="publications-grid"
               className="mt-7 grid grid-cols-1 gap-6 md:grid-cols-2"
             >
-              {visiblePublications.map((pub) => (
-                <article
-                  key={pub.id}
-                  className="glass-panel group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3B82F6]/45"
-                >
-                  <div>
-                    <div className="h-40 sm:h-44 w-full border-b border-white/10 bg-[#0A0D12]">
-                      <PublicationSchematic
-                        type={pub.schematic}
-                        seed={pub.index}
-                        figureUrl={pub.figureUrl}
-                        title={pub.title}
-                      />
-                    </div>
+              {visiblePublications.map((pub) => {
+                const isFocusedPaper = focusedPublicationId === pub.id;
 
-                    <div className="p-5 sm:p-6">
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-[#8B95A5] tabular-nums">
-                        <span className="font-semibold text-[#60A5FA]">{pub.year}</span>
-                        <span aria-hidden="true" className="text-white/25">·</span>
-                        <span className="text-[#C4CCD6]">{pub.venue}</span>
+                if (isFocusedPaper) {
+                  return (
+                    <article
+                      key={pub.id}
+                      id={`publication-card-${pub.id}`}
+                      data-testid={`publication-card-${pub.id}`}
+                      data-focused="true"
+                      className="glass-panel animate-paper-focus relative col-span-1 scroll-mt-28 overflow-hidden rounded-2xl border border-[#60A5FA]/80 bg-gradient-to-br from-[#16233D]/95 via-[#111827]/95 to-[#0D121C] md:col-span-2"
+                    >
+                      {/* Traveling top sapphire optical beam */}
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#93C5FD] to-transparent"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="animate-beam-sweep pointer-events-none absolute left-0 top-0 h-[2px] w-44 bg-gradient-to-r from-transparent via-[#BAE6FD] to-transparent"
+                      />
+
+                      <div className="grid grid-cols-1 lg:grid-cols-12">
+                        <div className="flex items-center justify-center border-b border-white/10 bg-[#F8FAFC] lg:col-span-5 lg:border-b-0 lg:border-r">
+                          <div className="aspect-video w-full overflow-hidden lg:h-full lg:aspect-auto">
+                            <PublicationSchematic
+                              type={pub.schematic}
+                              seed={pub.index}
+                              figureUrl={pub.figureUrl}
+                              title={pub.title}
+                              venue={pub.venue}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col justify-between lg:col-span-7">
+                          <div className="p-6 sm:p-7">
+                            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs tabular-nums">
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <span className="font-semibold text-[#38BDF8]">
+                                  Spotlight Paper
+                                </span>
+                                <span aria-hidden="true" className="text-white/25">·</span>
+                                <span className="font-semibold text-[#60A5FA]">{pub.year}</span>
+                                <span aria-hidden="true" className="text-white/25">·</span>
+                                <span className="text-[#E2E8F0]">{pub.venue}</span>
+                              </div>
+                              <span className="text-[#93C5FD]">
+                                {pub.citations} citations
+                              </span>
+                            </div>
+
+                            <h3 className="mt-3 text-xl font-bold leading-snug text-[#F8FAFC] sm:text-2xl">
+                              {pub.title}
+                            </h3>
+
+                            <p className="mt-2 text-xs text-[#94A3B8]">
+                              {pub.authors}
+                            </p>
+
+                            <p className="mt-3.5 text-sm leading-relaxed tracking-[0.01em] text-[#D1D9E6]">
+                              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#60A5FA]">
+                                Core Idea:
+                              </span>{' '}
+                              {pub.abstract}
+                            </p>
+
+                            {pub.highlights?.length > 0 && (
+                              <ul className="mt-4 space-y-1.5 border-t border-white/10 pt-3.5 text-xs leading-relaxed text-[#C4CCD6]">
+                                {pub.highlights.slice(0, 3).map((item) => (
+                                  <li key={item} className="flex items-start gap-2">
+                                    <span
+                                      aria-hidden="true"
+                                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#60A5FA]"
+                                    />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+
+                            <p className="mt-4 text-xs font-medium text-[#94A3B8]">
+                              <span className="font-mono uppercase tracking-wider text-[#64748B]">
+                                Publisher:
+                              </span>{' '}
+                              <span className="text-[#E2E8F0]">{pub.publisher}</span>
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#0A0D12]/70 px-6 py-4 sm:px-7">
+                            <div className="flex flex-wrap items-center gap-2.5">
+                              <a
+                                href={pub.scholarUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`View ${pub.title} on Google Scholar`}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-[#3B82F6]/50 bg-[#2563EB]/20 px-3.5 py-1.5 text-xs font-semibold text-[#93C5FD] transition-colors hover:border-[#60A5FA] hover:bg-[#2563EB]/35 hover:text-white whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+                              >
+                                <GoogleScholarIcon className="h-3.5 w-3.5 shrink-0" />
+                                <span>Google Scholar</span>
+                                <ExternalLink className="h-3 w-3 opacity-80" />
+                              </a>
+
+                              {pub.githubUrl && (
+                                <a
+                                  href={pub.githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  aria-label={`View GitHub code for ${pub.title}`}
+                                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1.5 text-xs font-medium text-[#F3F5F8] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+                                >
+                                  <GitHubIcon className="h-3.5 w-3.5" />
+                                  <span>GitHub Code</span>
+                                </a>
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => onSelectPublication(pub)}
+                              aria-label={`Inspect paper details and BibTeX for ${pub.title}`}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#3B82F6] whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#60A5FA]"
+                            >
+                              <span>Full Diagram &amp; BibTeX</span>
+                              <ArrowUpRight className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+
+                return (
+                  <article
+                    key={pub.id}
+                    id={`publication-card-${pub.id}`}
+                    data-testid={`publication-card-${pub.id}`}
+                    className="glass-panel group flex scroll-mt-28 flex-col justify-between overflow-hidden rounded-2xl border border-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3B82F6]/45"
+                  >
+                    <div>
+                      <div className="aspect-video w-full overflow-hidden border-b border-white/10 bg-[#F8FAFC]">
+                        <PublicationSchematic
+                          type={pub.schematic}
+                          seed={pub.index}
+                          figureUrl={pub.figureUrl}
+                          title={pub.title}
+                          venue={pub.venue}
+                        />
                       </div>
 
-                      <h3 className="mt-2.5 text-base sm:text-lg font-semibold leading-snug text-[#F3F5F8]">
-                        {pub.title}
-                      </h3>
+                      <div className="p-5 sm:p-6">
+                        <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[#8B95A5] tabular-nums">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-semibold text-[#60A5FA]">{pub.year}</span>
+                            <span aria-hidden="true" className="text-white/25">·</span>
+                            <span className="text-[#C4CCD6]">{pub.venue}</span>
+                          </div>
+                          <span className="text-[#94A3B8]">
+                            {pub.citations} citations
+                          </span>
+                        </div>
 
-                      <p className="mt-2.5 text-sm leading-relaxed tracking-[0.01em] text-[#C4CCD6] line-clamp-3">
-                        {pub.abstract}
-                      </p>
+                        <h3 className="mt-2.5 text-base font-semibold leading-snug text-[#F3F5F8] sm:text-lg">
+                          {pub.title}
+                        </h3>
+
+                        <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
+                          <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#60A5FA]">
+                            Idea:
+                          </span>{' '}
+                          {pub.abstract}
+                        </p>
+
+                        <p className="mt-3 text-xs font-medium text-[#94A3B8]">
+                          <span className="font-mono uppercase tracking-wider text-[#64748B]">
+                            Publisher:
+                          </span>{' '}
+                          <span className="text-[#E2E8F0]">{pub.publisher}</span>
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-5 py-3.5 sm:px-6">
-                    <span className="max-w-[220px] truncate text-xs text-[#687385]">
-                      {pub.publisher}
-                    </span>
-
-                    <div className="flex shrink-0 items-center gap-3">
-                      {pub.githubUrl && (
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 border-t border-white/10 bg-[#0A0D12]/60 px-5 py-3.5 sm:px-6">
+                      <div className="flex flex-wrap items-center gap-2">
                         <a
-                          href={pub.githubUrl}
+                          href={pub.scholarUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`View GitHub code for ${pub.title}`}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-[#F3F5F8] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+                          aria-label={`View ${pub.title} on Google Scholar`}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-[#3B82F6]/40 bg-[#2563EB]/15 px-3 py-1.5 text-xs font-semibold text-[#93C5FD] transition-colors hover:border-[#60A5FA] hover:bg-[#2563EB]/30 hover:text-white whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
                         >
-                          <GitHubIcon className="h-3.5 w-3.5" />
-                          <span>Code</span>
+                          <GoogleScholarIcon className="h-3.5 w-3.5 shrink-0" />
+                          <span>Google Scholar</span>
+                          <ExternalLink className="h-3 w-3 opacity-80" />
                         </a>
-                      )}
+
+                        {pub.githubUrl && (
+                          <a
+                            href={pub.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`View GitHub code for ${pub.title}`}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-[#F3F5F8] transition-colors hover:border-[#3B82F6] hover:text-[#60A5FA] whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+                          >
+                            <GitHubIcon className="h-3.5 w-3.5" />
+                            <span>Code</span>
+                          </a>
+                        )}
+                      </div>
 
                       <button
                         type="button"
@@ -278,57 +438,37 @@ export function PublicationsSection({
                         <ArrowUpRight className="h-3.5 w-3.5" />
                       </button>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
 
-            {!isSearchOrCodeActive && filtered.length > INITIAL_VISIBLE_COUNT && (
-              <div className="mt-9 flex flex-col items-center gap-2.5 text-center">
-                <button
-                  type="button"
-                  data-testid="publications-view-all-btn"
-                  onClick={() => setShowAll((prev) => !prev)}
-                  className="group relative inline-flex min-h-[46px] items-center gap-2.5 overflow-hidden rounded-full border border-white/15 bg-gradient-to-b from-[#171D27]/90 via-[#10141B]/90 to-[#0A0D12]/95 px-6 py-2.5 text-sm font-medium text-[#F3F5F8] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_12px_28px_-8px_rgba(0,0,0,0.7)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#60A5FA]/60 hover:shadow-[inset_0_1px_0_rgba(147,197,253,0.3),0_16px_36px_-8px_rgba(37,99,235,0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+            {!filterActive && (
+              <div className="mt-10 flex flex-col items-center gap-3 text-center">
+                <a
+                  href={PROFILE_INFO.links.scholar}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="publications-scholar-cta"
+                  className="group relative inline-flex min-h-[48px] items-center gap-3 overflow-hidden rounded-full border border-[#3B82F6]/45 bg-gradient-to-b from-[#1E3A8A]/45 via-[#141E33]/90 to-[#0C121D]/95 px-7 py-3 text-sm font-semibold text-[#F3F5F8] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.2),0_14px_30px_-8px_rgba(37,99,235,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#60A5FA] hover:shadow-[inset_0_1px_0_rgba(147,197,253,0.35),0_18px_38px_-8px_rgba(37,99,235,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
                 >
-                  {/* Subtle travelling photon laser glint along top edge */}
                   <span
                     aria-hidden="true"
-                    className="animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-36 bg-gradient-to-r from-transparent via-[#93C5FD] to-transparent opacity-70 group-hover:opacity-100"
+                    className="animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-40 bg-gradient-to-r from-transparent via-[#93C5FD] to-transparent opacity-80 group-hover:opacity-100"
                   />
+                  <GoogleScholarIcon className="h-4 w-4 shrink-0 text-[#60A5FA] transition-colors group-hover:text-white" />
+                  <span className="tracking-wide">
+                    View All Publications in Google Scholar
+                  </span>
+                  <span className="font-mono text-xs font-semibold tabular-nums rounded-full border border-[#3B82F6]/40 bg-[#2563EB]/20 px-2.5 py-0.5 text-[#93C5FD] group-hover:border-[#60A5FA] group-hover:text-white">
+                    {PUBLICATIONS.length}
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-[#93C5FD] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+                </a>
 
-                  {/* Ambient soft glow on hover */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-[#2563EB]/0 via-[#38BDF8]/10 to-[#2563EB]/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  />
-
-                  {showAll ? (
-                    <>
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[#94A3B8] transition-colors group-hover:text-white">
-                        <ChevronUp className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5" />
-                      </span>
-                      <span className="tracking-wide">Show Fewer (Top 2)</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[#60A5FA] transition-colors group-hover:bg-[#2563EB]/25 group-hover:text-[#93C5FD]">
-                        <Layers className="h-3 w-3" />
-                      </span>
-                      <span className="tracking-wide font-medium">View All Publications</span>
-                      <span className="font-mono text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full border border-white/10 bg-white/[0.05] text-[#93C5FD] transition-colors group-hover:border-[#3B82F6]/50 group-hover:bg-[#2563EB]/20 group-hover:text-white">
-                        {filtered.length}
-                      </span>
-                      <ChevronDown className="h-4 w-4 text-[#8B95A5] transition-transform duration-200 group-hover:translate-y-0.5 group-hover:text-[#93C5FD]" />
-                    </>
-                  )}
-                </button>
-
-                {!showAll && (
-                  <p className="font-mono text-xs text-[#8B95A5]">
-                    Showing 2 featured papers · {remainingCount} more available
-                  </p>
-                )}
+                <p className="font-mono text-xs text-[#8B95A5]">
+                  Showing 2 most recent publications · Search or select any filter above to explore all {PUBLICATIONS.length} papers here
+                </p>
               </div>
             )}
           </>

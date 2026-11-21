@@ -6,7 +6,10 @@ import {
   SPHERE_PALETTES,
   computeSphereEdges,
   generateFibonacciSpherePoints,
+  getConnectedSkillNodes,
+  getDiscoveryProgress,
   getDomainSkillSummary,
+  getNextUnexploredSkillId,
   getRelatedPublicationsForSkill,
   projectSkillNodes,
   stepInertiaVelocity,
@@ -132,3 +135,18 @@ test('stepInertiaVelocity smoothly decays drag momentum to rest', () => {
   assert.equal(vel.vx, 0);
   assert.equal(vel.vy, 0);
 });
+
+test('getConnectedSkillNodes, getNextUnexploredSkillId, and getDiscoveryProgress support game-style exploration', () => {
+  const neighbors = getConnectedSkillNodes('skill-kgc', 3);
+  assert.equal(neighbors.length, 3);
+  assert.ok(neighbors.every((n) => n.id !== 'skill-kgc'));
+
+  const nextId = getNextUnexploredSkillId(new Set(['skill-kgc']), 'gnns', 'skill-kgc');
+  assert.ok(nextId && nextId !== 'skill-kgc');
+
+  const progress = getDiscoveryProgress(new Set(['skill-kgc', 'skill-llm']));
+  assert.equal(progress.count, 2);
+  assert.equal(progress.total, SKILL_NODES.length);
+  assert.equal(progress.completed, false);
+});
+

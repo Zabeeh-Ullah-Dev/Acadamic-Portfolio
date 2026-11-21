@@ -6,10 +6,11 @@ import {
   Check,
   Copy,
   GraduationCap,
-  Hash,
   Mail,
 } from 'lucide-react';
-import { PROFILE_INFO } from '../data/portfolioData';
+import { PROFILE_INFO } from '../data/profileInfo';
+import { copyTextToClipboard, getPrimaryCopyEmail } from '../utils/clipboard';
+import { HERO_SPOTLIGHTS } from '../utils/heroSpotlights';
 import {
   HERO_ROLE_TITLES,
   getTypewriterDelayMs,
@@ -26,31 +27,11 @@ import {
 import { NetworkCanvas } from './NetworkCanvas';
 import { AnimatedCounter } from './AnimatedCounter';
 
-const HERO_SPOTLIGHTS = [
-  {
-    id: 'kgc',
-    tab: 'KG Completion',
-    venue: 'PAKDD 2025 · ACL BioNLP · DAAD AInet Fellowship',
-    summary:
-      'Negative-sampling-free BERT & LLM architectures (MuCo-KGC, MuCoS, DualRep) reasoning over relational knowledge graphs at scale.',
-    href: '#publications',
-  },
-  {
-    id: 'mucos',
-    tab: 'MuCoS',
-    venue: 'BioNLP @ ACL 2025 · AdaptiveBotsLab',
-    summary:
-      'MuCoS: Multi-context-aware sampling for drug-target prediction (BioNLP@ACL 2025). Also mirrored at AdaptiveBotsLab.',
-    href: '#publications',
-  },
-  {
-    id: 'biomedical',
-    tab: 'Drug Discovery & GNNs',
-    venue: 'KEGG50k / PharmKG-8k · Artificial Intelligence Review',
-    summary:
-      'Multi-context biomedical sampling, protein–protein link prediction, and explainable graph intelligence for clinical and ICS safety.',
-    href: '#expertise-cloud',
-  },
+const RESEARCH_SPECIALTIES = [
+  'Knowledge Graphs',
+  'Transformers & LLMs',
+  'GNNs',
+  'Biomedical AI',
 ];
 
 function useTypewriterRole(roles = HERO_ROLE_TITLES) {
@@ -81,13 +62,14 @@ function useTypewriterRole(roles = HERO_ROLE_TITLES) {
   return activePhrase.slice(0, state.charCount);
 }
 
-export function HeroSection() {
+export function HeroSection({ onExplorePaper }) {
   const [imgError, setImgError] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedTarget, setCopiedTarget] = useState(null);
   const [activeSpotlightIndex, setActiveSpotlightIndex] = useState(0);
   const [spotlightPaused, setSpotlightPaused] = useState(false);
   const [portraitTilt, setPortraitTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 40 });
   const typedRole = useTypewriterRole(HERO_ROLE_TITLES);
+  const primaryCopyEmail = getPrimaryCopyEmail(PROFILE_INFO);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia?.(
@@ -102,13 +84,15 @@ export function HeroSection() {
     return () => window.clearInterval(timer);
   }, [spotlightPaused]);
 
-  const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(PROFILE_INFO.emails.academic);
-      setCopiedEmail(true);
-      window.setTimeout(() => setCopiedEmail(false), 2000);
-    } catch {
-      setCopiedEmail(false);
+  const handleCopyEmail = async (targetKey, emailAddress) => {
+    const ok = await copyTextToClipboard(emailAddress);
+    if (ok) {
+      setCopiedTarget(targetKey);
+      window.setTimeout(() => {
+        setCopiedTarget((current) => (current === targetKey ? null : current));
+      }, 2000);
+    } else {
+      setCopiedTarget(null);
     }
   };
 
@@ -138,15 +122,10 @@ export function HeroSection() {
       ariaLabel: 'Google Scholar (367+ citations)',
       href: PROFILE_INFO.links.scholar,
       Icon: GoogleScholarIcon,
-      badge: `${PROFILE_INFO.metrics.citations}+`,
-      // Google Scholar Blue (#4285F4)
-      colorClass: 'text-[#4285F4]',
-      borderClass: 'border-white/12 hover:border-[#4285F4]/75',
-      bgHoverClass: 'hover:bg-[#4285F4]/12',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(66,133,244,0.6)]',
-      dotClass: 'bg-[#4285F4]',
-      beamGradient: 'from-transparent via-[#4285F4] to-transparent',
-      glowGradient: 'from-[#4285F4]/0 via-[#4285F4]/20 to-[#4285F4]/0',
+      metric: `${PROFILE_INFO.metrics.citations}+`,
+      colorClass: 'text-[#60A5FA]',
+      hoverClasses:
+        'hover:border-[#4285F4]/70 hover:bg-[#4285F4]/12 hover:shadow-[0_10px_26px_-10px_rgba(66,133,244,0.65)]',
     },
     {
       id: 'scopus',
@@ -154,15 +133,9 @@ export function HeroSection() {
       ariaLabel: `Scopus Author Profile (ID: ${PROFILE_INFO.scopusId})`,
       href: PROFILE_INFO.links.scopus,
       Icon: ScopusIcon,
-      badge: 'ID',
-      // Scopus Orange (#F97316 / #EA580C)
       colorClass: 'text-[#FB923C]',
-      borderClass: 'border-white/12 hover:border-[#F97316]/80',
-      bgHoverClass: 'hover:bg-[#F97316]/15',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(249,115,22,0.65)]',
-      dotClass: 'bg-[#F97316]',
-      beamGradient: 'from-transparent via-[#FB923C] to-transparent',
-      glowGradient: 'from-[#F97316]/0 via-[#F97316]/20 to-[#F97316]/0',
+      hoverClasses:
+        'hover:border-[#F97316]/70 hover:bg-[#F97316]/12 hover:shadow-[0_10px_26px_-10px_rgba(249,115,22,0.65)]',
     },
     {
       id: 'github',
@@ -170,14 +143,9 @@ export function HeroSection() {
       ariaLabel: 'GitHub Repositories',
       href: PROFILE_INFO.links.github,
       Icon: GitHubIcon,
-      // GitHub Purple / Platinum (#A855F7)
       colorClass: 'text-[#C084FC]',
-      borderClass: 'border-white/12 hover:border-[#A855F7]/75',
-      bgHoverClass: 'hover:bg-[#A855F7]/12',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(168,85,247,0.6)]',
-      dotClass: 'bg-[#A855F7]',
-      beamGradient: 'from-transparent via-[#C084FC] to-transparent',
-      glowGradient: 'from-[#A855F7]/0 via-[#A855F7]/20 to-[#A855F7]/0',
+      hoverClasses:
+        'hover:border-[#A855F7]/70 hover:bg-[#A855F7]/12 hover:shadow-[0_10px_26px_-10px_rgba(168,85,247,0.65)]',
     },
     {
       id: 'linkedin',
@@ -185,14 +153,9 @@ export function HeroSection() {
       ariaLabel: 'LinkedIn Profile',
       href: PROFILE_INFO.links.linkedin,
       Icon: LinkedInIcon,
-      // LinkedIn Blue (#0A66C2)
-      colorClass: 'text-[#0A66C2]',
-      borderClass: 'border-white/12 hover:border-[#0A66C2]/80',
-      bgHoverClass: 'hover:bg-[#0A66C2]/15',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(10,102,194,0.65)]',
-      dotClass: 'bg-[#0A66C2]',
-      beamGradient: 'from-transparent via-[#38BDF8] to-transparent',
-      glowGradient: 'from-[#0A66C2]/0 via-[#0A66C2]/20 to-[#0A66C2]/0',
+      colorClass: 'text-[#38BDF8]',
+      hoverClasses:
+        'hover:border-[#0A66C2]/80 hover:bg-[#0A66C2]/15 hover:shadow-[0_10px_26px_-10px_rgba(10,102,194,0.65)]',
     },
     {
       id: 'youtube',
@@ -200,15 +163,10 @@ export function HeroSection() {
       ariaLabel: 'YouTube Channel & 219+ Video Lectures',
       href: PROFILE_INFO.links.youtube,
       Icon: YouTubeIcon,
-      badge: `${PROFILE_INFO.metrics.videos}+`,
-      // YouTube Red (#FF0000 / #EF4444)
-      colorClass: 'text-[#EF4444]',
-      borderClass: 'border-white/12 hover:border-[#EF4444]/80',
-      bgHoverClass: 'hover:bg-[#EF4444]/15',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(239,68,68,0.65)]',
-      dotClass: 'bg-[#EF4444]',
-      beamGradient: 'from-transparent via-[#EF4444] to-transparent',
-      glowGradient: 'from-[#EF4444]/0 via-[#EF4444]/20 to-[#EF4444]/0',
+      metric: `${PROFILE_INFO.metrics.videos}+`,
+      colorClass: 'text-[#F87171]',
+      hoverClasses:
+        'hover:border-[#EF4444]/75 hover:bg-[#EF4444]/12 hover:shadow-[0_10px_26px_-10px_rgba(239,68,68,0.65)]',
     },
     {
       id: 'orcid',
@@ -216,58 +174,62 @@ export function HeroSection() {
       ariaLabel: 'ORCID Academic Record',
       href: PROFILE_INFO.links.orcid,
       Icon: OrcidIcon,
-      // ORCID Lime-Green (#A6CE39)
       colorClass: 'text-[#A6CE39]',
-      borderClass: 'border-white/12 hover:border-[#A6CE39]/80',
-      bgHoverClass: 'hover:bg-[#A6CE39]/15',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(166,206,57,0.65)]',
-      dotClass: 'bg-[#A6CE39]',
-      beamGradient: 'from-transparent via-[#A6CE39] to-transparent',
-      glowGradient: 'from-[#A6CE39]/0 via-[#A6CE39]/20 to-[#A6CE39]/0',
-    },
-    {
-      id: 'email',
-      label: 'Email',
-      ariaLabel: 'Copy Academic Email',
-      isEmailButton: true,
-      Icon: Mail,
-      // Academic Email Cyan (#06B6D4)
-      colorClass: 'text-[#06B6D4]',
-      borderClass: 'border-white/12 hover:border-[#06B6D4]/80',
-      bgHoverClass: 'hover:bg-[#06B6D4]/15',
-      shadowClass: 'hover:shadow-[0_0_22px_-2px_rgba(6,182,212,0.65)]',
-      dotClass: 'bg-[#06B6D4]',
-      beamGradient: 'from-transparent via-[#22D3EE] to-transparent',
-      glowGradient: 'from-[#06B6D4]/0 via-[#06B6D4]/20 to-[#06B6D4]/0',
+      hoverClasses:
+        'hover:border-[#A6CE39]/75 hover:bg-[#A6CE39]/12 hover:shadow-[0_10px_26px_-10px_rgba(166,206,57,0.6)]',
     },
   ];
 
   return (
     <section
       id="top"
-      className="relative overflow-hidden bg-[#0C0F14]"
+      aria-label="Haji Gul Research Profile"
+      className="relative overflow-hidden bg-gradient-to-b from-[#060911] via-[#080C15] to-[#0B0E14]"
     >
-      {/* 2050 Spatial Coordinate Grid with soft radial fade */}
+      {/* Research-Mode-Synced Subtle Spectral Studio Lighting */}
       <div
         aria-hidden="true"
-        className="architect-grid pointer-events-none absolute inset-0 opacity-75 [mask-image:radial-gradient(ellipse_at_70%_25%,black_15%,transparent_78%)]"
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
+          activeSpotlight.id === 'biomedical'
+            ? 'bg-[radial-gradient(ellipse_56%_52%_at_76%_36%,rgba(20,184,166,0.14),transparent_68%),radial-gradient(ellipse_48%_44%_at_54%_6%,rgba(37,99,235,0.16),transparent_64%),radial-gradient(ellipse_44%_36%_at_16%_82%,rgba(14,165,233,0.09),transparent_66%)]'
+            : activeSpotlight.id === 'mucos'
+              ? 'bg-[radial-gradient(ellipse_56%_52%_at_76%_36%,rgba(14,165,233,0.16),transparent_68%),radial-gradient(ellipse_48%_44%_at_54%_6%,rgba(59,130,246,0.16),transparent_64%),radial-gradient(ellipse_44%_36%_at_16%_82%,rgba(56,189,248,0.1),transparent_66%)]'
+              : 'bg-[radial-gradient(ellipse_56%_52%_at_76%_36%,rgba(37,99,235,0.18),transparent_68%),radial-gradient(ellipse_48%_44%_at_54%_6%,rgba(99,102,241,0.13),transparent_64%),radial-gradient(ellipse_44%_36%_at_16%_82%,rgba(14,165,233,0.09),transparent_66%)]'
+        }`}
       />
 
-      {/* Multi-layered atmospheric cobalt & deep-sapphire volumetric glow */}
+      {/* Dual-Scale Precision Scientific Embedding Coordinate Field */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(37,99,235,0.26),transparent_58%),radial-gradient(ellipse_at_bottom_left,rgba(29,78,216,0.14),transparent_55%)]"
+        className="architect-grid-precision pointer-events-none absolute inset-0 opacity-75 [mask-image:radial-gradient(ellipse_85%_82%_at_66%_42%,black_18%,rgba(0,0,0,0.42)_58%,transparent_94%)]"
       />
 
-      <NetworkCanvas />
+      {/* Interactive Research-Authentic Knowledge Graph, Transformer Attention & GNN Canvas */}
+      <NetworkCanvas researchMode={activeSpotlight.id} />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-14 pt-12 sm:px-6 sm:pt-18 lg:px-8 lg:pb-16 lg:pt-20">
+      {/* Measured Readability & Seamless Vertical Transition Scrims (Preserves >12:1 Left Text Contrast) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(6,9,17,0.68)_0%,rgba(6,9,17,0.34)_40%,transparent_66%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(6,9,17,0.32)_0%,transparent_18%,transparent_80%,rgba(11,14,20,0.96)_100%)]"
+      />
+
+      {/* Crisp Subtle Bottom Luminous Horizon Seam */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/35 to-transparent"
+      />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-12 pt-9 sm:px-6 sm:pt-11 lg:px-8 lg:pb-14 lg:pt-12">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
-          {/* Left Column: Expressive Typography, Interactive Research Spotlight & Action Dock */}
+          {/* Left Column: Modern Editorial Identity, Research Spotlight Deck & Unified Action Dock */}
           <div className="animate-panel-enter lg:col-span-7">
             <div
               data-testid="hero-subheadline"
-              className="flex flex-col gap-0.5 text-sm font-medium tracking-[0.02em] sm:flex-row sm:items-center sm:gap-2"
+              className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm font-medium tracking-[0.015em]"
             >
               <span className="inline-flex min-h-[1.375rem] items-center whitespace-nowrap font-semibold text-[#60A5FA]">
                 <span data-testid="hero-typed-role" aria-hidden="true">
@@ -282,7 +244,7 @@ export function HeroSection() {
                   {HERO_ROLE_TITLES.join(', ')}
                 </span>
               </span>
-              <span aria-hidden="true" className="hidden text-[#475569] sm:inline">
+              <span aria-hidden="true" className="text-[#475569]">
                 ·
               </span>
               <span className="whitespace-nowrap text-[#94A3B8]">
@@ -291,59 +253,80 @@ export function HeroSection() {
             </div>
 
             <h1
-              className="mt-4 bg-gradient-to-br from-[#FFFFFF] via-[#F3F5F8] to-[#93C5FD] bg-clip-text text-5xl font-extrabold leading-[0.98] tracking-[-0.035em] text-transparent sm:text-[4.75rem] lg:text-[6.25rem]"
+              className="mt-3.5 bg-gradient-to-b from-white via-[#F8FAFC] to-[#93C5FD] bg-clip-text text-5xl font-extrabold leading-[0.96] tracking-[-0.04em] text-transparent sm:text-[4.85rem] lg:text-[6.1rem]"
               style={{ textWrap: 'balance' }}
             >
               {PROFILE_INFO.name}
             </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6] sm:text-lg">
+            <p className="mt-4 max-w-[54ch] text-base leading-relaxed tracking-[0.01em] text-[#D5DFEC] sm:text-[17px]">
               {PROFILE_INFO.summary}
             </p>
 
-            {/* Interactive Auto-Cycling Research Spotlight (Engaging Kinetic Switcher) */}
+            {/* Clean Unboxed Specialization Index (Editorial Middot Rhythm) */}
+            <div className="mt-3.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[12px] text-[#7E8EA6]">
+              {RESEARCH_SPECIALTIES.map((topic, index) => (
+                <span key={topic} className="inline-flex items-center gap-2.5">
+                  {index > 0 && (
+                    <span aria-hidden="true" className="text-[#3B82F6]/60">
+                      ·
+                    </span>
+                  )}
+                  <span className="whitespace-nowrap">{topic}</span>
+                </span>
+              ))}
+            </div>
+
+            {/* Modern Glass Research Highlight Deck */}
             <div
               data-testid="hero-spotlight"
               onMouseEnter={() => setSpotlightPaused(true)}
               onMouseLeave={() => setSpotlightPaused(false)}
-              className="relative mt-7 overflow-hidden border-y border-white/12 bg-gradient-to-r from-[#111827]/45 via-transparent to-transparent py-4 pl-0.5"
+              className="glass-panel relative mt-6 overflow-hidden rounded-2xl border border-white/12 bg-gradient-to-br from-[#121B2D]/88 via-[#0E1523]/88 to-[#0B0F18]/92 p-4 shadow-[0_22px_54px_-24px_rgba(37,99,235,0.48),inset_0_1px_0_rgba(186,230,253,0.16)] sm:p-5"
             >
-              {/* Optical 1px cobalt beam sweep gliding along upper rail */}
+              {/* Crisp top optical accent hairline */}
               <div
                 aria-hidden="true"
-                className="animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-40 bg-gradient-to-r from-transparent via-[#93C5FD] to-transparent"
+                className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/75 to-transparent"
               />
-              <div
-                role="tablist"
-                aria-label="Core research highlights"
-                className="flex flex-wrap items-center gap-1.5"
-              >
-                {HERO_SPOTLIGHTS.map((item, idx) => {
-                  const isActive = idx === activeSpotlightIndex;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={isActive}
-                      onClick={() => setActiveSpotlightIndex(idx)}
-                      className={
-                        isActive
-                          ? 'relative overflow-hidden rounded-lg border border-[#3B82F6]/65 bg-[#2563EB]/20 px-3 py-1.5 text-xs font-semibold text-[#F8FAFC] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#60A5FA]'
-                          : 'rounded-lg border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[#8B95A5] transition-colors hover:border-[#3B82F6]/45 hover:text-[#93C5FD] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#3B82F6]'
-                      }
-                    >
-                      <span>{item.tab}</span>
-                      {isActive && !spotlightPaused && (
-                        <span
-                          key={`bar-${activeSpotlight.id}`}
-                          aria-hidden="true"
-                          className="animate-hero-bar absolute inset-x-0 bottom-0 h-[2px] bg-[#60A5FA]"
-                        />
-                      )}
-                    </button>
-                  );
-                })}
+
+              <div className="flex flex-wrap items-center justify-between gap-2.5">
+                <div
+                  role="tablist"
+                  aria-label="Core research highlights"
+                  className="inline-flex flex-wrap items-center gap-1 rounded-xl border border-white/10 bg-[#080C15]/80 p-1"
+                >
+                  {HERO_SPOTLIGHTS.map((item, idx) => {
+                    const isActive = idx === activeSpotlightIndex;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setActiveSpotlightIndex(idx)}
+                        className={
+                          isActive
+                            ? 'relative overflow-hidden rounded-lg bg-[#2563EB]/24 px-3 py-1.5 text-xs font-semibold text-white shadow-[inset_0_1px_0_rgba(147,197,253,0.3)] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#60A5FA]'
+                            : 'rounded-lg px-3 py-1.5 text-xs font-medium text-[#94A3B8] transition-colors hover:bg-white/[0.04] hover:text-[#E2E8F0] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#3B82F6]'
+                        }
+                      >
+                        <span>{item.tab}</span>
+                        {isActive && !spotlightPaused && (
+                          <span
+                            key={`bar-${activeSpotlight.id}`}
+                            aria-hidden="true"
+                            className="animate-hero-bar absolute inset-x-1.5 bottom-0 h-[2px] rounded-full bg-gradient-to-r from-[#3B82F6] to-[#38BDF8]"
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <span className="hidden font-mono text-[11px] tracking-[0.02em] text-[#7A8AA3] sm:inline">
+                  Featured Paper
+                </span>
               </div>
 
               <div
@@ -353,150 +336,144 @@ export function HeroSection() {
                 <p className="font-mono text-xs text-[#60A5FA]">
                   {activeSpotlight.venue}
                 </p>
-                <p className="mt-1 text-sm leading-relaxed text-[#E2E8F0]">
+                <p className="mt-1.5 text-sm leading-relaxed text-[#E2E8F0]">
                   {activeSpotlight.summary}{' '}
-                  <a
-                    href={activeSpotlight.href}
-                    className="inline-flex items-center gap-0.5 font-medium text-[#60A5FA] hover:text-[#93C5FD] hover:underline"
+                  <button
+                    type="button"
+                    data-testid="hero-spotlight-explore"
+                    onClick={() => onExplorePaper?.(activeSpotlight.publicationId)}
+                    aria-label={
+                      activeSpotlight.paperTitle
+                        ? `Explore exact paper: ${activeSpotlight.paperTitle}`
+                        : `Explore ${activeSpotlight.tab} paper`
+                    }
+                    className="group inline-flex items-center gap-1 font-semibold text-[#7DD3FC] transition-colors hover:text-[#E0F2FE] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
                   >
-                    <span>Explore</span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </a>
+                    <span className="underline decoration-[#38BDF8]/55 underline-offset-4 transition-colors group-hover:decoration-[#E0F2FE]">
+                      Explore
+                    </span>
+                    <ArrowUpRight
+                      className="icon-nudge-ne h-3.5 w-3.5"
+                      aria-hidden="true"
+                    />
+                  </button>
                 </p>
               </div>
             </div>
 
-            {/* High-Impact Action & Brand-Animated Academic Profiles Dock */}
-            <div
-              data-testid="hero-action-dock"
-              className="mt-8 flex flex-wrap items-center gap-2 sm:gap-2.5"
-            >
-              {/* Primary Publications Action */}
-              <a
-                href="#publications"
-                aria-label="View Publications & Code Archive"
-                className="group relative inline-flex min-h-[40px] items-center gap-2 overflow-hidden rounded-xl border border-[#3B82F6]/70 bg-gradient-to-r from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_20px_-4px_rgba(37,99,235,0.6),inset_0_1px_0_rgba(255,255,255,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#93C5FD] hover:shadow-[0_8px_28px_-4px_rgba(37,99,235,0.8)] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+            {/* Clean Two-Tier Action & Academic Identity Dock */}
+            <div data-testid="hero-action-dock" className="mt-6 space-y-3">
+              {/* Row 1: Primary Focal CTA + Secondary Email Copy */}
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href="#publications"
+                  title="Jump to Publications & Code Archive"
+                  className="hover-sheen group inline-flex min-h-[44px] items-center gap-2.5 rounded-xl border border-[#60A5FA]/70 bg-gradient-to-r from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_34px_-10px_rgba(37,99,235,0.8),inset_0_1px_0_rgba(255,255,255,0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#BAE6FD] hover:shadow-[0_18px_40px_-10px_rgba(37,99,235,0.92)] active:scale-[0.98] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+                >
+                  <span>Explore Publications</span>
+                  <ArrowDown
+                    className="icon-nudge-down h-4 w-4 text-[#BAE6FD]"
+                    aria-hidden="true"
+                  />
+                </a>
+
+                <button
+                  type="button"
+                  data-testid="hero-copy-email-btn"
+                  onClick={() => handleCopyEmail('personal', primaryCopyEmail)}
+                  title={`Copy personal email (${primaryCopyEmail})`}
+                  aria-label={`Copy personal email (${primaryCopyEmail})`}
+                  className="hover-sheen group inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-white/14 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-[#E2E8F0] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#38BDF8]/65 hover:bg-[#0EA5E9]/10 hover:text-white active:scale-[0.98] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#38BDF8]"
+                >
+                  {copiedTarget === 'personal' ? (
+                    <>
+                      <Check
+                        className="animate-check-pop h-4 w-4 shrink-0 text-emerald-400"
+                        aria-hidden="true"
+                      />
+                      <span className="font-semibold text-emerald-300">
+                        Email Copied
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Mail
+                        className="icon-spring h-4 w-4 shrink-0 text-[#38BDF8]"
+                        aria-hidden="true"
+                      />
+                      <span>Copy Email</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Row 2: Unified Single-Row Verified Academic Profiles */}
+              <div
+                aria-label="Verified academic profiles"
+                className="flex flex-wrap items-center gap-1.5"
               >
-                <span>Publications</span>
-                <ArrowDown className="h-3.5 w-3.5 text-[#93C5FD] transition-transform duration-200 group-hover:translate-y-0.5" />
-              </a>
-
-              {/* Brand Profiles with Signature Color Animations */}
-              {brandProfiles.map((item) => {
-                const Icon = item.Icon;
-
-                if (item.isEmailButton) {
+                {brandProfiles.map((item) => {
+                  const Icon = item.Icon;
                   return (
-                    <button
+                    <a
                       key={item.id}
-                      type="button"
-                      onClick={handleCopyEmail}
+                      href={item.href}
                       aria-label={item.ariaLabel}
-                      className={`group relative inline-flex min-h-[40px] items-center gap-2 overflow-hidden rounded-xl border bg-white/[0.03] px-3.5 py-2 text-xs font-medium text-[#F3F5F8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 ${item.borderClass} ${item.bgHoverClass} ${item.shadowClass}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`hover-sheen group inline-flex min-h-[36px] items-center gap-1.5 rounded-xl border border-white/10 bg-[#0E1421]/85 px-2.5 py-1.5 text-[11.5px] font-medium text-[#CBD5E1] transition-all duration-200 hover:-translate-y-0.5 hover:text-white active:scale-[0.97] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA] ${item.hoverClasses}`}
                     >
-                      {/* Animated Brand Color Traveling Laser Glint */}
-                      <span
+                      <Icon
+                        className={`icon-spring h-3.5 w-3.5 shrink-0 ${item.colorClass}`}
                         aria-hidden="true"
-                        className={`animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-24 bg-gradient-to-r ${item.beamGradient} opacity-70 group-hover:opacity-100`}
                       />
-
-                      {/* Brand Radial Glow Aura on Hover */}
-                      <span
-                        aria-hidden="true"
-                        className={`pointer-events-none absolute inset-0 -z-10 rounded-xl bg-gradient-to-r ${item.glowGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-                      />
-
-                      {/* Pulsing Brand Beacon Dot */}
-                      <span className="relative flex h-2 w-2 items-center justify-center">
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${item.dotClass} opacity-75`} />
-                        <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${item.dotClass}`} />
-                      </span>
-
-                      {copiedEmail ? (
-                        <span className="inline-flex items-center gap-1 font-sans font-semibold text-[#4ADE80]">
-                          <Check className="h-3.5 w-3.5 shrink-0" />
-                          <span>Copied!</span>
+                      <span>{item.label}</span>
+                      {item.metric && (
+                        <span className="font-mono text-[10.5px] font-semibold text-[#8B95A5] tabular-nums transition-colors group-hover:text-white">
+                          {item.metric}
                         </span>
-                      ) : (
-                        <>
-                          <Icon className={`h-3.5 w-3.5 shrink-0 transition-all duration-200 group-hover:scale-115 ${item.colorClass}`} />
-                          <span>{item.label}</span>
-                        </>
                       )}
-                    </button>
+                    </a>
                   );
-                }
-
-                return (
-                  <a
-                    key={item.id}
-                    href={item.href}
-                    aria-label={item.ariaLabel}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`group relative inline-flex min-h-[40px] items-center gap-2 overflow-hidden rounded-xl border bg-white/[0.03] px-3.5 py-2 text-xs font-medium text-[#F3F5F8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 ${item.borderClass} ${item.bgHoverClass} ${item.shadowClass}`}
-                  >
-                    {/* Animated Brand Color Traveling Laser Glint */}
-                    <span
-                      aria-hidden="true"
-                      className={`animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-24 bg-gradient-to-r ${item.beamGradient} opacity-70 group-hover:opacity-100`}
-                    />
-
-                    {/* Brand Radial Glow Aura on Hover */}
-                    <span
-                      aria-hidden="true"
-                      className={`pointer-events-none absolute inset-0 -z-10 rounded-xl bg-gradient-to-r ${item.glowGradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-                    />
-
-                    {/* Pulsing Brand Beacon Dot */}
-                    <span className="relative flex h-2 w-2 items-center justify-center">
-                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${item.dotClass} opacity-75`} />
-                      <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${item.dotClass}`} />
-                    </span>
-
-                    <Icon className={`h-3.5 w-3.5 shrink-0 transition-all duration-200 group-hover:scale-115 group-hover:rotate-[-6deg] ${item.colorClass}`} />
-                    <span>{item.label}</span>
-
-                    {item.badge && (
-                      <span className="rounded-full bg-white/[0.06] border border-white/10 px-1.5 py-0.2 font-mono text-[10px] font-semibold text-[#CBD5E1] transition-colors group-hover:border-current group-hover:text-white">
-                        {item.badge}
-                      </span>
-                    )}
-                  </a>
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Kinetic Orbital Stage + Interactive 3D-Tilt Portrait Card */}
+          {/* Right Column: Modern Editorial Portrait Stage with 3D Parallax & Optical Framing */}
           <div
-            style={{ animationDelay: '90ms' }}
+            style={{ animationDelay: '70ms' }}
             className="animate-panel-enter relative lg:col-span-5"
           >
-            {/* Outer counter-rotating orbital constellations framing the portrait */}
+            {/* Calm ambient deep-sapphire backlight synced to studio geometry */}
+            <div
+              aria-hidden="true"
+              className="animate-aura-breathe pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_50%_45%,rgba(37,99,235,0.28),rgba(14,165,233,0.09)_48%,transparent_72%)] blur-2xl"
+            />
+
+            {/* Subtle architectural orbital arcs aligned with the Knowledge Graph */}
             <svg
               viewBox="0 0 420 420"
               aria-hidden="true"
-              className="animate-orbit-slow pointer-events-none absolute -right-12 -top-12 h-72 w-72 opacity-40"
+              className="animate-orbit-slow pointer-events-none absolute -right-10 -top-10 h-68 w-68 opacity-25"
             >
               <circle
                 cx="210"
                 cy="210"
                 r="186"
                 fill="none"
-                stroke="#3B82F6"
-                strokeWidth="1.15"
-                strokeDasharray="6 10"
+                stroke="#60A5FA"
+                strokeWidth="1"
+                strokeDasharray="5 12"
               />
-              <circle cx="210" cy="24" r="4.2" fill="#60A5FA" />
-              <circle cx="396" cy="210" r="3" fill="#2563EB" />
-              <circle cx="80" cy="340" r="3.2" fill="#93C5FD" />
+              <circle cx="210" cy="24" r="3.5" fill="#93C5FD" />
+              <circle cx="396" cy="210" r="2.6" fill="#38BDF8" />
             </svg>
 
             <svg
               viewBox="0 0 320 320"
               aria-hidden="true"
-              className="animate-orbit-reverse pointer-events-none absolute -bottom-10 -left-10 h-56 w-56 opacity-35"
+              className="animate-orbit-reverse pointer-events-none absolute -bottom-9 -left-9 h-52 w-52 opacity-20"
             >
               <circle
                 cx="160"
@@ -505,46 +482,64 @@ export function HeroSection() {
                 fill="none"
                 stroke="#60A5FA"
                 strokeWidth="1"
-                strokeDasharray="3 8"
+                strokeDasharray="3 10"
               />
-              <circle cx="160" cy="26" r="3.5" fill="#93C5FD" />
-              <circle cx="294" cy="160" r="2.8" fill="#3B82F6" />
+              <circle cx="160" cy="26" r="3" fill="#93C5FD" />
             </svg>
 
-            {/* Interactive 3D-Tilt Glass Portrait Frame */}
+            {/* Gallery-Grade Interactive 3D-Tilt Portrait Frame */}
             <div
               onMouseMove={handlePortraitMove}
               onMouseLeave={resetPortraitTilt}
               style={{
                 transform: `perspective(1000px) rotateX(${portraitTilt.rx}deg) rotateY(${portraitTilt.ry}deg)`,
-                transition: 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
+                transition: 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
               }}
-              className="glass-panel relative overflow-hidden rounded-3xl border border-[#3B82F6]/35 p-3 shadow-[inset_0_1px_0_rgba(147,197,253,0.22),0_32px_80px_-20px_rgba(37,99,235,0.52)]"
+              className="glass-panel relative overflow-hidden rounded-[1.75rem] border border-[#60A5FA]/32 bg-gradient-to-b from-[#131C2E]/94 to-[#0B1019]/96 p-3 shadow-[inset_0_1px_0_rgba(186,230,253,0.22),0_34px_84px_-22px_rgba(37,99,235,0.48)]"
             >
-              {/* Traveling optical glint along glass bezel top edge */}
+              {/* Crisp top optical edge highlight */}
               <div
                 aria-hidden="true"
-                className="animate-beam-sweep pointer-events-none absolute top-0 left-0 z-20 h-px w-48 bg-gradient-to-r from-transparent via-[#93C5FD]/90 to-transparent"
+                className="pointer-events-none absolute inset-x-10 top-0 z-20 h-px bg-gradient-to-r from-transparent via-[#BAE6FD]/80 to-transparent"
               />
 
-              {/* Cursor-reactive subtle sapphire spotlight sheen */}
+              {/* Cursor-reactive specular sapphire sheen */}
               <div
                 aria-hidden="true"
                 style={{
-                  background: `radial-gradient(280px circle at ${portraitTilt.gx}% ${portraitTilt.gy}%, rgba(96, 165, 250, 0.18), transparent 70%)`,
+                  background: `radial-gradient(290px circle at ${portraitTilt.gx}% ${portraitTilt.gy}%, rgba(96, 165, 250, 0.16), transparent 70%)`,
                 }}
                 className="pointer-events-none absolute inset-0 z-10"
               />
 
-              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-[#0A0D12]">
+              <div className="group/photo relative aspect-[4/3] overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#0A0D12]">
                 {!imgError ? (
-                  <img
-                    src={PROFILE_INFO.photoUrl}
-                    alt="Haji Gul with research collaborators during the DAAD AInet Fellowship in Germany"
-                    referrerPolicy="no-referrer"
-                    onError={() => setImgError(true)}
-                    className="h-full w-full object-cover object-center transition-transform duration-700 hover:scale-[1.035]"
-                  />
+                  <>
+                    <picture className="block h-full w-full">
+                      {PROFILE_INFO.photoWebpUrl && (
+                        <source
+                          srcSet={PROFILE_INFO.photoWebpUrl}
+                          type="image/webp"
+                        />
+                      )}
+                      <img
+                        src={PROFILE_INFO.photoUrl}
+                        alt="Haji Gul with research collaborators during the DAAD AInet Fellowship in Germany"
+                        width={960}
+                        height={720}
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        onError={() => setImgError(true)}
+                        className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover/photo:scale-[1.03]"
+                      />
+                    </picture>
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#090D16]/75 via-[#090D16]/20 to-transparent"
+                    />
+                  </>
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center bg-[#141922] p-6 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#3B82F6] bg-[#0C0F14]">
@@ -555,44 +550,28 @@ export function HeroSection() {
                     </p>
                   </div>
                 )}
-
-                {/* Precision 2050 optical 4-corner frame reticles */}
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-[#93C5FD]/75"
-                />
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute right-3 top-3 h-4 w-4 rounded-tr-md border-r-2 border-t-2 border-[#93C5FD]/75"
-                />
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute left-3 bottom-3 h-4 w-4 rounded-bl-md border-b-2 border-l-2 border-[#93C5FD]/75"
-                />
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute right-3 bottom-3 h-4 w-4 rounded-br-md border-b-2 border-r-2 border-[#93C5FD]/75"
-                />
               </div>
 
-              <div className="relative z-20 mt-3 px-2 pb-1">
-                <p className="text-xs font-medium text-[#94A3B8]">
+              <div className="relative z-20 mt-3.5 px-2 pb-1">
+                <p className="text-xs font-medium text-[#CBD5E1]">
                   {PROFILE_INFO.photoCaption}
                 </p>
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3 text-xs">
                   <button
                     type="button"
-                    onClick={handleCopyEmail}
+                    onClick={() =>
+                      handleCopyEmail('academic', PROFILE_INFO.emails.academic)
+                    }
                     aria-label={`Copy academic email ${PROFILE_INFO.emails.academic}`}
-                    className="inline-flex min-w-0 items-center gap-1.5 font-mono text-[#F3F5F8] transition-colors hover:text-[#60A5FA] focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+                    className="group inline-flex min-w-0 items-center gap-1.5 font-mono text-[#E2E8F0] transition-colors hover:text-[#60A5FA] focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
                   >
-                    <Mail className="h-3.5 w-3.5 shrink-0 text-[#3B82F6]" />
+                    <Mail className="icon-spring h-3.5 w-3.5 shrink-0 text-[#60A5FA]" />
                     <span className="truncate">{PROFILE_INFO.emails.academic}</span>
-                    {copiedEmail ? (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-[#60A5FA]" />
+                    {copiedTarget === 'academic' ? (
+                      <Check className="animate-check-pop h-3.5 w-3.5 shrink-0 text-emerald-400" />
                     ) : (
-                      <Copy className="h-3 w-3 shrink-0 text-[#8B95A5]" />
+                      <Copy className="h-3 w-3 shrink-0 text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]" />
                     )}
                   </button>
 
@@ -601,11 +580,11 @@ export function HeroSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`View verified Scopus Author Profile (${PROFILE_INFO.scopusId})`}
-                    className="group/scopus inline-flex shrink-0 items-center gap-1.5 font-mono text-[#8B95A5] tabular-nums transition-colors hover:text-[#FB923C] focus-visible:outline-2 focus-visible:outline-[#F97316]"
+                    className="group inline-flex shrink-0 items-center gap-1.5 font-mono text-[#94A3B8] tabular-nums transition-colors hover:text-[#FB923C] focus-visible:outline-2 focus-visible:outline-[#F97316]"
                   >
-                    <ScopusIcon className="h-3.5 w-3.5 text-[#F97316] transition-transform duration-200 group-hover/scopus:scale-110" />
+                    <ScopusIcon className="icon-spring h-3.5 w-3.5 text-[#F97316]" />
                     <span>Scopus {PROFILE_INFO.scopusId}</span>
-                    <ArrowUpRight className="h-3 w-3 opacity-60 transition-transform duration-200 group-hover/scopus:translate-x-0.5 group-hover/scopus:-translate-y-0.5 group-hover/scopus:opacity-100" />
+                    <ArrowUpRight className="icon-nudge-ne h-3 w-3 opacity-70 group-hover:opacity-100" />
                   </a>
                 </div>
               </div>
@@ -613,89 +592,111 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Sleek Borderless Horizontal Telemetry Bar with Animated Counting Numbers */}
+        {/* Modern Unified Glass Impact Metrics Ribbon */}
         <div
           data-testid="hero-metrics-strip"
-          className="relative mt-14 grid grid-cols-2 gap-y-5 overflow-hidden border-t border-white/12 pt-7 sm:grid-cols-5 sm:divide-x sm:divide-white/10"
+          className="relative mt-9 overflow-hidden rounded-2xl border border-white/12 bg-[#0D1320]/76 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.9),inset_0_1px_0_rgba(186,230,253,0.12)] backdrop-blur-md"
         >
           <div
             aria-hidden="true"
-            className="animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-44 bg-gradient-to-r from-transparent via-[#60A5FA]/80 to-transparent"
+            className="pointer-events-none absolute inset-x-16 top-0 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/50 to-transparent"
           />
 
-          <div className="group rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-[#172554]/25 sm:pl-0 sm:pr-5 cursor-default">
-            <p className="text-xs font-medium text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]">
-              Total Citations
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-[#60A5FA] tabular-nums sm:text-3xl">
-              <AnimatedCounter
-                target={PROFILE_INFO.metrics.citations}
-                suffix="+"
-                duration={1800}
+          <div className="grid grid-cols-2 divide-y divide-white/8 sm:grid-cols-5 sm:divide-x sm:divide-y-0 sm:divide-white/10">
+            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
               />
-            </p>
-            <p className="mt-0.5 text-xs text-[#687385]">Google Scholar</p>
-          </div>
+              <p className="text-xs font-medium text-[#94A3B8] transition-colors group-hover:text-[#BAE6FD]">
+                Total Citations
+              </p>
+              <p className="mt-1 font-mono text-2xl font-semibold text-[#60A5FA] tabular-nums sm:text-[1.85rem]">
+                <AnimatedCounter
+                  target={PROFILE_INFO.metrics.citations}
+                  suffix="+"
+                  duration={1600}
+                />
+              </p>
+              <p className="mt-0.5 text-xs text-[#728097]">Google Scholar</p>
+            </div>
 
-          <div className="group rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-[#172554]/25 sm:px-5 cursor-default">
-            <p className="text-xs font-medium text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]">
-              h-index
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-[#F3F5F8] tabular-nums sm:text-3xl">
-              <AnimatedCounter
-                target={PROFILE_INFO.metrics.hIndex}
-                duration={1300}
+            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
               />
-            </p>
-            <p className="mt-0.5 text-xs text-[#687385]">Impact Index</p>
-          </div>
+              <p className="text-xs font-medium text-[#94A3B8] transition-colors group-hover:text-[#BAE6FD]">
+                h-index
+              </p>
+              <p className="mt-1 font-mono text-2xl font-semibold text-[#F8FAFC] tabular-nums sm:text-[1.85rem]">
+                <AnimatedCounter
+                  target={PROFILE_INFO.metrics.hIndex}
+                  duration={1200}
+                />
+              </p>
+              <p className="mt-0.5 text-xs text-[#728097]">Impact Index</p>
+            </div>
 
-          <div className="group rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-[#172554]/25 sm:px-5 cursor-default">
-            <p className="text-xs font-medium text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]">
-              i10-index
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-[#F3F5F8] tabular-nums sm:text-3xl">
-              <AnimatedCounter
-                target={PROFILE_INFO.metrics.i10Index}
-                duration={1400}
+            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
               />
-            </p>
-            <p className="mt-0.5 text-xs text-[#687385]">10+ Cited Papers</p>
-          </div>
+              <p className="text-xs font-medium text-[#94A3B8] transition-colors group-hover:text-[#BAE6FD]">
+                i10-index
+              </p>
+              <p className="mt-1 font-mono text-2xl font-semibold text-[#F8FAFC] tabular-nums sm:text-[1.85rem]">
+                <AnimatedCounter
+                  target={PROFILE_INFO.metrics.i10Index}
+                  duration={1300}
+                />
+              </p>
+              <p className="mt-0.5 text-xs text-[#728097]">10+ Cited Papers</p>
+            </div>
 
-          <div className="group rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-[#172554]/25 sm:px-5 cursor-default">
-            <p className="text-xs font-medium text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]">
-              Publications
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-[#60A5FA] tabular-nums sm:text-3xl">
-              <AnimatedCounter
-                target={PROFILE_INFO.metrics.publications}
-                duration={1600}
+            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
               />
-            </p>
-            <p className="mt-0.5 text-xs text-[#687385]">2020 – 2026</p>
-          </div>
+              <p className="text-xs font-medium text-[#94A3B8] transition-colors group-hover:text-[#BAE6FD]">
+                Publications
+              </p>
+              <p className="mt-1 font-mono text-2xl font-semibold text-[#60A5FA] tabular-nums sm:text-[1.85rem]">
+                <AnimatedCounter
+                  target={PROFILE_INFO.metrics.publications}
+                  duration={1400}
+                />
+              </p>
+              <p className="mt-0.5 text-xs text-[#728097]">2020 – 2026</p>
+            </div>
 
-          <div className="group col-span-2 rounded-lg px-2 py-1.5 transition-colors duration-200 hover:bg-[#172554]/25 sm:col-span-1 sm:pl-5 sm:pr-0 cursor-default">
-            <p className="text-xs font-medium text-[#8B95A5] transition-colors group-hover:text-[#93C5FD]">
-              Open Pedagogy
-            </p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-[#F3F5F8] tabular-nums sm:text-3xl">
-              <AnimatedCounter
-                target={PROFILE_INFO.metrics.videos}
-                suffix="+"
-                duration={1900}
+            <div className="group relative col-span-2 px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:col-span-1 sm:px-5 sm:py-5">
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
               />
-            </p>
-            <a
-              href={PROFILE_INFO.links.youtube}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-0.5 inline-flex items-center gap-1 text-xs text-[#60A5FA] hover:text-[#93C5FD] hover:underline"
-            >
-              <BookOpen className="h-3 w-3" />
-              <span>Video Lectures</span>
-            </a>
+              <p className="text-xs font-medium text-[#94A3B8] transition-colors group-hover:text-[#BAE6FD]">
+                Open Pedagogy
+              </p>
+              <p className="mt-1 font-mono text-2xl font-semibold text-[#F8FAFC] tabular-nums sm:text-[1.85rem]">
+                <AnimatedCounter
+                  target={PROFILE_INFO.metrics.videos}
+                  suffix="+"
+                  duration={1700}
+                />
+              </p>
+              <a
+                href={PROFILE_INFO.links.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-0.5 inline-flex items-center gap-1 text-xs text-[#60A5FA] hover:text-[#93C5FD] hover:underline"
+              >
+                <BookOpen className="icon-spring h-3 w-3" aria-hidden="true" />
+                <span>Video Lectures</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

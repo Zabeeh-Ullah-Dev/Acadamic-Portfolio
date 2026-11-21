@@ -6,7 +6,7 @@ import { SkillBubbleCloud } from './SkillBubbleCloud';
 
 const PILLAR_ICONS = [Network, Activity, Cpu];
 
-export function ResearchSection({ onSelectTopic }) {
+export function ResearchSection({ onSelectTopic, onSelectPublication }) {
   const [sectionRef, revealed] = useScrollReveal({ threshold: 0.06 });
   const [activePillarId, setActivePillarId] = useState(null);
 
@@ -140,7 +140,10 @@ export function ResearchSection({ onSelectTopic }) {
         </div>
 
         {/* Interactive 3D-Style Research Skill Bubble Cloud */}
-        <SkillBubbleCloud onSelectTopic={onSelectTopic} />
+        <SkillBubbleCloud
+          onSelectTopic={onSelectTopic}
+          onSelectPublication={onSelectPublication}
+        />
       </div>
     </section>
   );

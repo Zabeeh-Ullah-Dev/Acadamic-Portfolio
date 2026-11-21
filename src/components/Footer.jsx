@@ -13,7 +13,9 @@ import { HajiGulLogo } from './HajiGulLogo';
 const FOOTER_QUICK_LINKS = [
   { label: 'Research', href: '#research' },
   { label: 'Publications', href: '#publications' },
+  { label: 'Code', href: '#projects' },
   { label: 'Experience', href: '#timeline' },
+  { label: 'Teaching', href: '#academic-profile' },
   { label: 'Honors', href: '#honors' },
   { label: 'Lectures', href: '#lectures' },
   { label: 'Contact', href: '#contact' },
@@ -28,7 +30,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#4285F4]/15',
     hoverText: 'hover:text-[#4285F4]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(66,133,244,0.65)]',
-    beamGradient: 'from-transparent via-[#4285F4] to-transparent',
   },
   {
     label: 'Scopus Author ID',
@@ -38,7 +39,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#F97316]/15',
     hoverText: 'hover:text-[#FB923C]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(249,115,22,0.65)]',
-    beamGradient: 'from-transparent via-[#FB923C] to-transparent',
   },
   {
     label: 'GitHub',
@@ -48,7 +48,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#A855F7]/15',
     hoverText: 'hover:text-[#C084FC]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(168,85,247,0.65)]',
-    beamGradient: 'from-transparent via-[#C084FC] to-transparent',
   },
   {
     label: 'ORCID',
@@ -58,7 +57,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#A6CE39]/15',
     hoverText: 'hover:text-[#A6CE39]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(166,206,57,0.65)]',
-    beamGradient: 'from-transparent via-[#A6CE39] to-transparent',
   },
   {
     label: 'LinkedIn',
@@ -68,7 +66,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#0A66C2]/15',
     hoverText: 'hover:text-[#38BDF8]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(10,102,194,0.65)]',
-    beamGradient: 'from-transparent via-[#38BDF8] to-transparent',
   },
   {
     label: 'YouTube',
@@ -78,7 +75,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#EF4444]/15',
     hoverText: 'hover:text-[#EF4444]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(239,68,68,0.65)]',
-    beamGradient: 'from-transparent via-[#EF4444] to-transparent',
   },
   {
     label: 'Academic Email',
@@ -89,7 +85,6 @@ const FOOTER_SOCIALS = [
     hoverBg: 'hover:bg-[#06B6D4]/15',
     hoverText: 'hover:text-[#22D3EE]',
     hoverShadow: 'hover:shadow-[0_0_18px_-2px_rgba(6,182,212,0.65)]',
-    beamGradient: 'from-transparent via-[#22D3EE] to-transparent',
   },
 ];
 
@@ -101,25 +96,25 @@ export function Footer() {
       data-testid="site-footer"
       className="relative overflow-hidden border-t border-white/10 bg-[#080B10] py-12 text-[#F3F5F8]"
     >
-      {/* Subtle traveling optical hairline along footer top border */}
+      {/* Calm architectural top highlight */}
       <div
         aria-hidden="true"
-        className="animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-48 bg-gradient-to-r from-transparent via-[#60A5FA]/70 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3B82F6]/35 to-transparent"
       />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-center lg:gap-6">
+        <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-center lg:gap-4">
           {/* Identity Anchor */}
           <a
             href="#top"
-            className="group inline-flex shrink-0 items-center gap-3.5 self-start focus-visible:outline-2 focus-visible:outline-[#3B82F6] lg:self-auto"
+            className="group inline-flex shrink-0 items-center gap-3 self-start focus-visible:outline-2 focus-visible:outline-[#3B82F6] lg:self-auto"
           >
-            <HajiGulLogo className="h-9 w-auto shrink-0 transition-transform duration-200 group-hover:scale-[1.03]" />
+            <HajiGulLogo className="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-[1.03]" />
             <div>
               <p className="text-sm font-semibold tracking-tight text-[#F3F5F8] transition-colors group-hover:text-[#60A5FA]">
                 {PROFILE_INFO.name}
               </p>
-              <p className="text-xs text-[#8B95A5]">
+              <p className="text-[11.5px] text-[#8B95A5]">
                 School of Digital Science · Universiti Brunei Darussalam
               </p>
             </div>
@@ -128,7 +123,7 @@ export function Footer() {
           {/* Minimalist Quick Links */}
           <nav
             aria-label="Footer navigation"
-            className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-[#94A3B8] lg:flex-nowrap"
+            className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-xs font-medium text-[#94A3B8] lg:flex-nowrap"
           >
             {FOOTER_QUICK_LINKS.map((link) => (
               <a
@@ -141,10 +136,10 @@ export function Footer() {
             ))}
           </nav>
 
-          {/* Tactile Social Media Icon Dock with Brand Color Animations */}
+          {/* Tactile Social Media Icon Dock with Hover-Only Spring Motion */}
           <div
             aria-label="Academic and social profiles"
-            className="flex shrink-0 flex-wrap items-center gap-2 lg:flex-nowrap"
+            className="flex shrink-0 flex-wrap items-center gap-1.5 lg:flex-nowrap"
           >
             {FOOTER_SOCIALS.map(
               ({
@@ -156,7 +151,6 @@ export function Footer() {
                 hoverBg,
                 hoverText,
                 hoverShadow,
-                beamGradient,
               }) => (
                 <a
                   key={label}
@@ -166,15 +160,10 @@ export function Footer() {
                   {...(external
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
-                  className={`group relative inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/12 bg-white/[0.03] text-[#94A3B8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[#3B82F6] ${hoverBorder} ${hoverBg} ${hoverText} ${hoverShadow}`}
+                  className={`hover-sheen group relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/12 bg-white/[0.03] text-[#94A3B8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.95] focus-visible:outline-2 focus-visible:outline-[#3B82F6] ${hoverBorder} ${hoverBg} ${hoverText} ${hoverShadow}`}
                 >
-                  {/* Traveling laser glint in signature brand color */}
-                  <span
-                    aria-hidden="true"
-                    className={`animate-beam-sweep pointer-events-none absolute top-0 left-0 h-px w-16 bg-gradient-to-r ${beamGradient} opacity-60 group-hover:opacity-100`}
-                  />
                   <Icon
-                    className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-115 group-hover:rotate-[-6deg]"
+                    className="icon-spring h-3.5 w-3.5 shrink-0"
                     aria-hidden="true"
                   />
                 </a>

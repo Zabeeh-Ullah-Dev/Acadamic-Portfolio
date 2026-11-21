@@ -1,20 +1,19 @@
-export function PublicationSchematic({ type, seed = 1, figureUrl, title }) {
+export function PublicationSchematic({ type, seed = 1, figureUrl, title, venue }) {
   if (figureUrl || type === 'local-paths-similarity') {
     const src = figureUrl || '/physica_local_paths_diagram.png';
-    const isSciReports = src.includes('scientific_reports');
-    const badgeText = isSciReports ? 'Figure 1 · Nature Sci Rep' : 'Fig. 1 · Physica A';
 
     return (
-      <div className="relative flex h-full w-full items-center justify-center bg-white p-2 transition-transform duration-300 group-hover:scale-[1.015]">
+      <div className="flex h-full w-full items-center justify-center bg-[#F8FAFC] p-1 transition-transform duration-300 group-hover:scale-[1.015]">
         <img
           src={src}
-          alt={title || 'Publication Diagram'}
+          alt={title ? `${title} — architecture diagram` : 'Publication Diagram'}
+          width={520}
+          height={220}
+          referrerPolicy="no-referrer"
           className="h-full w-full object-contain"
           loading="lazy"
+          decoding="async"
         />
-        <span className="pointer-events-none absolute bottom-1.5 right-2 rounded bg-[#0A0D12]/90 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-[#93C5FD] shadow-md backdrop-blur-sm">
-          {badgeText}
-        </span>
       </div>
     );
   }

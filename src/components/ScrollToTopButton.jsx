@@ -75,7 +75,7 @@ export function ScrollToTopButton() {
       data-testid="scroll-to-top-btn"
       onClick={handleScrollToTop}
       aria-label="Scroll back to top navigation bar"
-      className="animate-scroll-top-enter group fixed bottom-5 right-5 z-40 inline-flex h-11 items-center gap-2 rounded-xl border border-[#3B82F6]/70 bg-gradient-to-br from-[#172554]/95 via-[#1E3A8A]/90 to-[#0C0F14]/95 px-3 text-xs font-semibold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(147,197,253,0.28),0_12px_28px_-6px_rgba(37,99,235,0.65)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-[#93C5FD] hover:from-[#2563EB] hover:to-[#1D4ED8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+      className="hover-sheen animate-scroll-top-enter group fixed bottom-5 right-5 z-40 inline-flex h-11 items-center gap-2 rounded-xl border border-[#3B82F6]/70 bg-gradient-to-br from-[#172554]/95 via-[#1E3A8A]/90 to-[#0C0F14]/95 px-3 text-xs font-semibold text-[#F8FAFC] shadow-[inset_0_1px_0_rgba(147,197,253,0.28),0_12px_28px_-6px_rgba(37,99,235,0.65)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-[#93C5FD] hover:from-[#2563EB] hover:to-[#1D4ED8] active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
     >
       <span className="relative flex h-7 w-7 items-center justify-center">
         <svg
@@ -104,7 +104,7 @@ export function ScrollToTopButton() {
           />
         </svg>
         <ArrowUp
-          className="absolute h-3.5 w-3.5 text-[#F8FAFC] transition-transform duration-200 group-hover:-translate-y-0.5"
+          className="icon-nudge-up absolute h-3.5 w-3.5 text-[#F8FAFC]"
           aria-hidden="true"
         />
       </span>

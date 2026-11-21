@@ -73,11 +73,12 @@ export function PublicationModal({ publication, onClose }) {
               <div className="flex flex-col items-center bg-white p-3 text-center">
                 <img
                   src={publication.figureUrl}
-                  alt={publication.title}
+                  alt={`${publication.title} — architecture diagram`}
+                  referrerPolicy="no-referrer"
                   className="max-h-80 sm:max-h-96 w-full object-contain"
                 />
                 <p className="mt-2 font-mono text-[11px] font-medium text-slate-700">
-                  {publication.figureCaption || 'Official Paper Figure'}
+                  {publication.figureCaption || 'Official Paper Diagram'}
                 </p>
               </div>
             ) : (
@@ -87,6 +88,7 @@ export function PublicationModal({ publication, onClose }) {
                   seed={publication.index}
                   figureUrl={publication.figureUrl}
                   title={publication.title}
+                  venue={publication.venue}
                 />
               </div>
             )}
@@ -105,7 +107,7 @@ export function PublicationModal({ publication, onClose }) {
 
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-[#8B95A5]">
-              Research Abstract
+              Core Idea &amp; Abstract
             </h4>
             <p className="mt-1.5 text-sm leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
               {publication.abstract}
@@ -172,6 +174,18 @@ export function PublicationModal({ publication, onClose }) {
               >
                 <GitHubIcon className="h-3.5 w-3.5" />
                 <span>GitHub Code</span>
+                <ExternalLink className="h-3 w-3 opacity-70" />
+              </a>
+            )}
+            {publication.mirrorGithubUrl && (
+              <a
+                href={publication.mirrorGithubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C4CCD6] transition-colors hover:text-[#60A5FA]"
+              >
+                <GitHubIcon className="h-3.5 w-3.5" />
+                <span>AdaptiveBotsLab Mirror</span>
                 <ExternalLink className="h-3 w-3 opacity-70" />
               </a>
             )}

@@ -722,3 +722,76 @@ export function getRelatedPublicationsForSkill(skill, limit = 3) {
 
   return matches.slice(0, limit);
 }
+
+/**
+ * Returns top neighboring skills from the same domain or graph proximity
+ * so visitors can hop along skill-tree connections inside the inspector.
+ */
+export function getConnectedSkillNodes(skillId, limit = 3) {
+  const current = SKILL_NODES.find((s) => s.id === skillId);
+  if (!current) return [];
+
+  const sameDomain = SKILL_NODES.filter(
+    (s) => s.id !== skillId && s.domain === current.domain
+  );
+  if (sameDomain.length >= limit) {
+    return sameDomain.slice(0, limit);
+  }
+
+  const others = SKILL_NODES.filter(
+    (s) => s.id !== skillId && s.domain !== current.domain
+  );
+  return [...sameDomain, ...others].slice(0, limit);
+}
+
+/**
+ * Picks the next unexplored skill bubble (prioritizing the active domain)
+ * for the game-style Scan Next targeting action.
+ */
+export function getNextUnexploredSkillId(
+  engagedIds,
+  activeDomain = 'all',
+  currentSkillId = null
+) {
+  const engaged =
+    engagedIds instanceof Set ? engagedIds : new Set(engagedIds || []);
+  const pool =
+    activeDomain === 'all'
+      ? SKILL_NODES
+      : SKILL_NODES.filter((s) => s.domain === activeDomain);
+
+  const candidatePool = pool.length > 0 ? pool : SKILL_NODES;
+  const unexplored = candidatePool.find(
+    (s) => !engaged.has(s.id) && s.id !== currentSkillId
+  );
+  if (unexplored) return unexplored.id;
+
+  const fallbackAnyUnexplored = SKILL_NODES.find(
+    (s) => !engaged.has(s.id) && s.id !== currentSkillId
+  );
+  if (fallbackAnyUnexplored) return fallbackAnyUnexplored.id;
+
+  const currentIdx = candidatePool.findIndex((s) => s.id === currentSkillId);
+  return candidatePool[(currentIdx + 1) % candidatePool.length].id;
+}
+
+/**
+ * Computes exploration progress percentage and mastery status across the sphere.
+ */
+export function getDiscoveryProgress(engagedIds) {
+  const total = SKILL_NODES.length;
+  const engagedSet =
+    engagedIds instanceof Set ? engagedIds : new Set(engagedIds || []);
+  let count = 0;
+  for (const node of SKILL_NODES) {
+    if (engagedSet.has(node.id)) count += 1;
+  }
+  const percent = total === 0 ? 0 : Math.round((count / total) * 100);
+  return {
+    count,
+    total,
+    percent,
+    completed: count >= total,
+  };
+}
+

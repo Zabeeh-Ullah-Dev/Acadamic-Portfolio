@@ -234,7 +234,7 @@ export function TimelineSection() {
     <section
       id="timeline"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#10141B] py-20 sm:py-24"
+      className="section-defer relative overflow-hidden bg-[#0C0F14] py-20 sm:py-24"
     >
       <div
         aria-hidden="true"

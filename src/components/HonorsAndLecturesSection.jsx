@@ -28,7 +28,11 @@ function LectureThumbnail({ src, title }) {
       <img
         src={src}
         alt={title}
+        width={800}
+        height={450}
         loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
       />
 
@@ -96,7 +100,7 @@ export function HonorsAndLecturesSection() {
       <section
         id="honors"
         ref={honorsRef}
-        className="relative overflow-hidden bg-[#0C0F14] py-20 sm:py-24"
+        className="section-defer relative overflow-hidden bg-[#0C0F14] py-20 sm:py-24"
       >
         <div
           aria-hidden="true"
@@ -365,6 +369,7 @@ export function HonorsAndLecturesSection() {
                   <img
                     src={activeCertificate.imageUrl}
                     alt={`Official certificate image for ${activeCertificate.title}`}
+                    decoding="async"
                     onError={() => setModalImageError(true)}
                     className="mx-auto block h-auto max-h-[60vh] w-full object-contain"
                   />
@@ -471,7 +476,7 @@ export function HonorsAndLecturesSection() {
       {/* Section 5: YouTube Teaching & Open Pedagogy Hub */}
       <section
         id="lectures"
-        className="bg-[#10141B] py-20 sm:py-24"
+        className="section-defer bg-[#10141B] py-20 sm:py-24"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">

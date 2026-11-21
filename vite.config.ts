@@ -12,11 +12,12 @@ export default defineConfig(() => {
       {
         name: 'resolve-og-app-url',
         transformIndexHtml(html: string): string {
-          const baseUrl = (
-            process.env.APP_URL ||
+          const rawUrl = (
             process.env.VITE_APP_URL ||
-            'https://ais-pre-x7qpv6q6wd5mlfww5q7u2j-979458670382.asia-southeast1.run.app'
+            process.env.APP_URL ||
+            'https://ais-pre-6kvgxivvpkrzsddonpg7qa-979458670382.asia-southeast1.run.app'
           ).replace(/\/$/, '');
+          const baseUrl = rawUrl.replace('://ais-dev-', '://ais-pre-');
           return html.replace(/__APP_URL__/g, baseUrl);
         },
       },
@@ -30,8 +31,8 @@ export default defineConfig(() => {
           if (error) {
             return;
           }
-          const distDir = path.resolve(__dirname, 'dist');
-          const srcAssets = path.resolve(__dirname, 'src/assets');
+          const distDir = path.resolve(import.meta.dirname, 'dist');
+          const srcAssets = path.resolve(import.meta.dirname, 'src/assets');
           const distAssets = path.resolve(distDir, 'src/assets');
           if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
             fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
@@ -41,10 +42,36 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname, '.'),
+      },
+    },
+    build: {
+      target: 'es2022',
+      cssMinify: true,
+      modulePreload: {
+        polyfill: false,
+      },
+      rollupOptions: {
+        output: {
+          manualChunks(id: string) {
+            if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+              return 'react-vendor';
+            }
+            if (id.includes('node_modules/lucide-react')) {
+              return 'icons-vendor';
+            }
+            if (id.includes('src/data/portfolioData')) {
+              return 'portfolio-data';
+            }
+            return undefined;
+          },
+        },
       },
     },
     server: {
+      host: '0.0.0.0',
+      port: 3000,
+      allowedHosts: true as const,
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',

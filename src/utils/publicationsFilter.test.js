@@ -1,24 +1,137 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
+  ACADEMIC_SERVICE,
   CERTIFICATIONS,
   EDUCATION_TIMELINE,
+  OPEN_SOURCE_CATEGORIES,
+  OPEN_SOURCE_PROJECTS,
   PUBLICATIONS,
+  SUBJECTS_TAUGHT,
+  TECHNICAL_SKILLS_STACK,
   YOUTUBE_LECTURES,
 } from '../data/portfolioData.js';
 import {
   filterAndSortPublications,
   getCategoryCounts,
   getCodeBackedCount,
+  getVisiblePublications,
+  isPublicationFilterActive,
 } from './publicationsFilter.js';
 
-test('inventory contains all 32 publications with unique ids and valid BibTeX', () => {
+test('inventory contains all 32 publications with unique ids, valid BibTeX, publisher, paper-specific scholar link, verified github links, and diagram image', () => {
   assert.equal(PUBLICATIONS.length, 32);
   const ids = new Set(PUBLICATIONS.map((p) => p.id));
   assert.equal(ids.size, 32);
+
+  let exactCitationCount = 0;
   for (const pub of PUBLICATIONS) {
+    assert.ok(pub.title && pub.title.length > 5, `Missing title for ${pub.id}`);
+    assert.ok(pub.abstract && pub.abstract.length > 20, `Missing idea/abstract for ${pub.id}`);
+    assert.ok(pub.publisher && pub.publisher.length > 1, `Missing publisher for ${pub.id}`);
+    assert.ok(pub.scholarUrl?.startsWith('https://scholar.google.com/'), `Missing scholarUrl for ${pub.id}`);
+    if (
+      pub.scholarUrl.startsWith(
+        'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:'
+      )
+    ) {
+      exactCitationCount += 1;
+    }
+    if (pub.githubUrl) {
+      assert.ok(pub.githubUrl.startsWith('https://github.com/'), `Invalid githubUrl for ${pub.id}`);
+      assert.ok(
+        !pub.githubUrl.includes('?tab=repositories&q='),
+        `Placeholder search githubUrl still present on ${pub.id}`
+      );
+    }
+    assert.ok(pub.figureUrl, `Missing figureUrl for ${pub.id}`);
+    const assetPath = path.join(process.cwd(), 'public', pub.figureUrl.replace(/^\//, ''));
+    assert.ok(fs.existsSync(assetPath), `Diagram file missing on disk for ${pub.id}: ${assetPath}`);
     assert.ok(pub.bibtex.includes('@'), `Missing BibTeX for ${pub.id}`);
     assert.ok(pub.year >= 2020 && pub.year <= 2026);
+  }
+
+  assert.equal(exactCitationCount, 31, 'Expected 31/32 exact view_citation Google Scholar URLs');
+  const pub11 = PUBLICATIONS.find((p) => p.id === 'pub-11');
+  assert.equal(
+    pub11?.scholarUrl,
+    'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:TFP_iSt0sucC'
+  );
+});
+
+test('default publications view shows only the 2 most recent papers, while search or any filter shows all matching papers', () => {
+  const defaultSorted = filterAndSortPublications(PUBLICATIONS, {
+    category: 'all',
+    searchQuery: '',
+    sortMode: 'year-desc',
+    onlyWithCode: false,
+  });
+  assert.equal(isPublicationFilterActive({ category: 'all', searchQuery: '', onlyWithCode: false }), false);
+  const defaultVisible = getVisiblePublications(defaultSorted, {
+    category: 'all',
+    searchQuery: '',
+    onlyWithCode: false,
+  });
+  assert.equal(defaultVisible.length, 2);
+  assert.ok(defaultVisible.every((p) => p.year === 2026));
+
+  const kgFiltered = filterAndSortPublications(PUBLICATIONS, {
+    category: 'kg-llm',
+    searchQuery: '',
+    sortMode: 'year-desc',
+    onlyWithCode: false,
+  });
+  const kgVisible = getVisiblePublications(kgFiltered, {
+    category: 'kg-llm',
+    searchQuery: '',
+    onlyWithCode: false,
+  });
+  assert.equal(kgVisible.length, kgFiltered.length);
+  assert.ok(kgVisible.length > 2);
+
+  const searchFiltered = filterAndSortPublications(PUBLICATIONS, {
+    category: 'all',
+    searchQuery: 'Link Prediction',
+    sortMode: 'year-desc',
+    onlyWithCode: false,
+  });
+  const searchVisible = getVisiblePublications(searchFiltered, {
+    category: 'all',
+    searchQuery: 'Link Prediction',
+    onlyWithCode: false,
+  });
+  assert.equal(searchVisible.length, searchFiltered.length);
+  assert.ok(searchVisible.length > 2);
+});
+
+test('focusedPublicationId isolates the exact spotlight paper inside the publications view', () => {
+  const allSorted = filterAndSortPublications(PUBLICATIONS, {
+    category: 'all',
+    searchQuery: '',
+    sortMode: 'year-desc',
+    onlyWithCode: false,
+  });
+
+  for (const targetId of ['pub-01', 'pub-02', 'pub-25']) {
+    assert.equal(
+      isPublicationFilterActive({
+        category: 'all',
+        searchQuery: '',
+        onlyWithCode: false,
+        focusedPublicationId: targetId,
+      }),
+      true
+    );
+    const visible = getVisiblePublications(allSorted, {
+      category: 'all',
+      searchQuery: '',
+      onlyWithCode: false,
+      focusedPublicationId: targetId,
+    });
+    assert.equal(visible.length, 1);
+    assert.equal(visible[0].id, targetId);
   }
 });
 
@@ -41,9 +154,9 @@ test('filtering by category returns only matching publications', () => {
   assert.ok(kgPapers.every((p) => p.category === 'kg-llm'));
 });
 
-test('onlyWithCode filters strictly to publications with GitHub repositories', () => {
+test('onlyWithCode filters strictly to the 8 publications with verified GitHub repositories', () => {
   const codeCount = getCodeBackedCount(PUBLICATIONS);
-  assert.ok(codeCount >= 6, 'Expected multiple publications with GitHub links');
+  assert.equal(codeCount, 8);
   const codePapers = filterAndSortPublications(PUBLICATIONS, {
     category: 'all',
     searchQuery: '',
@@ -142,5 +255,25 @@ test('youtube lectures contain all 6 exact playlists with thumbnail images', () 
       lec.thumbnailUrl.startsWith('/assets/portfolio/') && lec.thumbnailUrl.endsWith('.jpg'),
       `Invalid playlist image for ${lec.id}`
     );
+  }
+});
+
+test('subjects taught, academic service, technical skills, and 7-category open-source projects are complete', () => {
+  assert.equal(SUBJECTS_TAUGHT.primaryLanguage, 'Python');
+  assert.equal(SUBJECTS_TAUGHT.primaryTool, 'MATLAB');
+  assert.equal(SUBJECTS_TAUGHT.courses.length, 16);
+
+  assert.equal(ACADEMIC_SERVICE.conferences.length, 7);
+  assert.equal(ACADEMIC_SERVICE.journals.length, 6);
+
+  assert.equal(TECHNICAL_SKILLS_STACK.length, 7);
+  assert.equal(OPEN_SOURCE_CATEGORIES.length, 7);
+
+  const coveredCategories = new Set(OPEN_SOURCE_PROJECTS.map((p) => p.category));
+  for (const cat of OPEN_SOURCE_CATEGORIES) {
+    assert.ok(coveredCategories.has(cat.id), `No projects found for open-source category ${cat.id}`);
+  }
+  for (const proj of OPEN_SOURCE_PROJECTS) {
+    assert.ok(proj.repoUrl?.startsWith('https://github.com/'), `Missing repoUrl for ${proj.id}`);
   }
 });

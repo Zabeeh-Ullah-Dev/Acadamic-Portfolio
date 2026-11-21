@@ -63,3 +63,50 @@ export function getCategoryCounts(publications) {
 export function getCodeBackedCount(publications) {
   return publications.filter((pub) => Boolean(pub.githubUrl)).length;
 }
+
+export function isPublicationFilterActive({
+  category = 'all',
+  searchQuery = '',
+  onlyWithCode = false,
+  focusedPublicationId = null,
+} = {}) {
+  return (
+    Boolean(focusedPublicationId) ||
+    category !== 'all' ||
+    searchQuery.trim() !== '' ||
+    Boolean(onlyWithCode)
+  );
+}
+
+export function getVisiblePublications(
+  filteredPublications,
+  {
+    category = 'all',
+    searchQuery = '',
+    onlyWithCode = false,
+    focusedPublicationId = null,
+    initialLimit = 2,
+  } = {}
+) {
+  if (focusedPublicationId) {
+    const exactMatch = filteredPublications.find(
+      (pub) => pub.id === focusedPublicationId
+    );
+    if (exactMatch) {
+      return [exactMatch];
+    }
+  }
+  if (
+    isPublicationFilterActive({
+      category,
+      searchQuery,
+      onlyWithCode,
+      focusedPublicationId,
+    })
+  ) {
+    return filteredPublications;
+  }
+  return filteredPublications.slice(0, initialLimit);
+}
+
+
