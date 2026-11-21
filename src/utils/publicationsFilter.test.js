@@ -8,6 +8,7 @@ import {
   EDUCATION_TIMELINE,
   OPEN_SOURCE_CATEGORIES,
   OPEN_SOURCE_PROJECTS,
+  PROFILE_INFO,
   PUBLICATIONS,
   SUBJECTS_TAUGHT,
   TECHNICAL_SKILLS_STACK,
@@ -20,6 +21,8 @@ import {
   getVisiblePublications,
   isPublicationFilterActive,
 } from './publicationsFilter.js';
+import { SPLASH_HIGHLIGHTS } from './splashScreen.js';
+import { SEO_CONFIG } from './seoMeta.js';
 
 test('inventory contains all 32 publications with unique ids, valid BibTeX, publisher, paper-specific scholar link, verified github links, and diagram image', () => {
   assert.equal(PUBLICATIONS.length, 32);
@@ -276,4 +279,37 @@ test('subjects taught, academic service, technical skills, and 7-category open-s
   for (const proj of OPEN_SOURCE_PROJECTS) {
     assert.ok(proj.repoUrl?.startsWith('https://github.com/'), `Missing repoUrl for ${proj.id}`);
   }
+});
+
+test('Google Scholar metrics (publications, total citations, h-index, i10-index) are mathematically consistent across PROFILE_INFO, PUBLICATIONS, splash, SEO, and index.html', () => {
+  const { publications, citations, hIndex, i10Index } = PROFILE_INFO.metrics;
+
+  assert.equal(PUBLICATIONS.length, publications, 'PUBLICATIONS.length must match PROFILE_INFO.metrics.publications');
+
+  const sortedCitations = PUBLICATIONS.map((p) => p.citations).sort((a, b) => b - a);
+  const sumCitations = sortedCitations.reduce((acc, n) => acc + n, 0);
+  let computedH = 0;
+  for (let i = 0; i < sortedCitations.length; i += 1) {
+    if (sortedCitations[i] >= i + 1) computedH = i + 1;
+  }
+  const computedI10 = sortedCitations.filter((c) => c >= 10).length;
+
+  assert.equal(sumCitations, citations, 'Sum of per-paper citations must equal PROFILE_INFO.metrics.citations');
+  assert.equal(computedH, hIndex, 'Computed h-index must equal PROFILE_INFO.metrics.hIndex');
+  assert.equal(computedI10, i10Index, 'Computed i10-index must equal PROFILE_INFO.metrics.i10Index');
+
+  const splashPubs = SPLASH_HIGHLIGHTS.find((h) => h.label === 'Publications');
+  const splashCites = SPLASH_HIGHLIGHTS.find((h) => h.label === 'Citations');
+  const splashH = SPLASH_HIGHLIGHTS.find((h) => h.label === 'h-index');
+  assert.equal(splashPubs?.value, `${publications}`);
+  assert.equal(splashCites?.value, `${citations}+`);
+  assert.equal(splashH?.value, `${hIndex}`);
+
+  assert.ok(SEO_CONFIG.ogDescription.includes(`${citations}+ Citations`));
+  assert.ok(SEO_CONFIG.ogDescription.includes(`${publications} Publications`));
+
+  const indexHtml = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf8');
+  assert.ok(indexHtml.includes(`${citations}+ Citations`), 'index.html must include current citation count');
+  assert.ok(indexHtml.includes(`${publications} Publications`), 'index.html must include current publication count');
+  assert.ok(!indexHtml.includes('367+'), 'index.html must not contain stale 367+ citation count');
 });

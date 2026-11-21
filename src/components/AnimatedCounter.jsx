@@ -3,119 +3,131 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { computeCounterValue } from '../utils/counterAnimation';
 
 /**
- * AnimatedCounter counts smoothly from 0 to target number when in viewport.
- *
- * Features:
- * - IntersectionObserver viewport detection: starts counting when visible.
- * - Quartic ease-out deceleration curve for natural, lively counting animation.
- * - Replay on hover: hovering any metric triggers a fresh counting sweep.
- * - Tabular numbers styling: prevents digit layout jitter.
- * - Glowing aura while actively ticking up.
- * - Respects prefers-reduced-motion media query.
+ * StrictMode-safe, guaranteed-completion animated counter.
+ * - Counts smoothly from 0 to `target` using ease-out cubic once `start` is true
+ *   and the element enters the viewport.
+ * - Anchors `startTime` on the first animation frame so initial paint latency
+ *   never skips the early digits of the count-up.
+ * - Deduplicates integer state updates so small targets (10, 11, 32) avoid
+ *   unnecessary React re-renders between digit steps.
+ * - Supports hover replay via `replayKey` and uses a fallback settle timer so it
+ *   never stalls halfway (e.g., at 16 or 170+) under StrictMode or throttled tabs.
  */
 export function AnimatedCounter({
   target,
-  duration = 1800,
+  duration = 1400,
+  replayDuration = 950,
   prefix = '',
   suffix = '',
   className = '',
-  triggerOnHover = true,
+  start = true,
+  replayKey = 0,
 }) {
-  const [count, setCount] = useState(0);
-  const [isCounting, setIsCounting] = useState(false);
-  const elementRef = useRef(null);
-  const hasAnimatedRef = useRef(false);
-  const animFrameRef = useRef(0);
-
-  const startAnimation = useCallback(() => {
-    const prefersReducedMotion =
+  const [count, setCount] = useState(() => {
+    if (
       typeof window !== 'undefined' &&
-      Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-
-    if (prefersReducedMotion) {
-      setCount(target);
-      return;
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return target;
     }
+    return 0;
+  });
+  const [isVisible, setIsVisible] = useState(false);
+  const elRef = useRef(null);
 
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-    }
-
-    setIsCounting(true);
-    setCount(0);
-    const startTime = performance.now();
-
-    const step = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Quartic ease-out: rapid start, decelerating smoothly to exact target
-      const easeOut = 1 - Math.pow(1 - progress, 4);
-      const current = Math.round(easeOut * target);
-
-      setCount(current);
-
-      if (progress < 1) {
-        animFrameRef.current = requestAnimationFrame(step);
-      } else {
-        setCount(target);
-        setIsCounting(false);
-      }
-    };
-
-    animFrameRef.current = requestAnimationFrame(step);
-  }, [target, duration]);
-
+  // Track viewport entry cleanly (re-evaluates safely under React StrictMode)
   useEffect(() => {
-    const node = elementRef.current;
-    if (!node) return;
+    const node = elRef.current;
+    if (!node) return undefined;
 
-    // Immediately check if already visible in viewport
-    const rect = node.getBoundingClientRect();
-    if (rect.top <= window.innerHeight && rect.bottom >= 0 && !hasAnimatedRef.current) {
-      hasAnimatedRef.current = true;
-      startAnimation();
-      return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return undefined;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && !hasAnimatedRef.current) {
-          hasAnimatedRef.current = true;
-          startAnimation();
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsVisible(true);
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px 40px 0px' }
+      { threshold: 0.1 }
     );
 
     observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
-    return () => {
-      observer.disconnect();
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
+  // Run the count-up animation whenever ready + visible, or when replayed on hover
+  useEffect(() => {
+    const prefersReducedMotion = Boolean(
+      typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    );
+
+    if (prefersReducedMotion) {
+      setCount(target);
+      return undefined;
+    }
+
+    if (!start || !isVisible) {
+      return undefined;
+    }
+
+    let cancelled = false;
+    let rafId = 0;
+    let startTime = null;
+    let lastValue = 0;
+    const activeDuration = replayKey > 0 ? replayDuration : duration;
+
+    setCount(0);
+
+    const step = (now) => {
+      if (cancelled) return;
+      if (startTime === null) {
+        startTime = now;
+      }
+      const elapsed = now - startTime;
+      const nextVal = computeCounterValue(target, elapsed, activeDuration);
+      if (nextVal !== lastValue) {
+        lastValue = nextVal;
+        setCount(nextVal);
+      }
+      if (elapsed < activeDuration) {
+        rafId = window.requestAnimationFrame(step);
+      } else if (lastValue !== target) {
+        lastValue = target;
+        setCount(target);
       }
     };
-  }, [startAnimation]);
 
-  const handleMouseEnter = () => {
-    if (triggerOnHover && !isCounting) {
-      startAnimation();
-    }
-  };
+    rafId = window.requestAnimationFrame(step);
+
+    // Fallback guarantee: even if rAF is throttled in a background tab, always land on exact target
+    const settleTimer = window.setTimeout(() => {
+      if (!cancelled) {
+        lastValue = target;
+        setCount(target);
+      }
+    }, activeDuration + 450);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(settleTimer);
+    };
+  }, [target, duration, replayDuration, start, isVisible, replayKey]);
 
   return (
     <span
-      ref={elementRef}
-      onMouseEnter={handleMouseEnter}
-      className={`inline-block tabular-nums transition-all duration-150 ${className} ${
-        isCounting ? 'drop-shadow-[0_0_12px_rgba(96,165,250,0.85)] scale-[1.03]' : ''
-      }`}
+      ref={elRef}
+      aria-label={`${prefix}${target}${suffix}`}
+      className={`inline-block tabular-nums ${className}`}
     >
       {prefix}
       {count}

@@ -1,10 +1,11 @@
+import { PROFILE_INFO } from '../data/profileInfo.js';
+
 export const SEO_CONFIG = {
   siteName: 'Haji Gul',
   title: 'Haji Gul — AI & Knowledge Graph Research Portfolio',
   description:
     'Explore Haji Gul’s AI research portfolio: PhD researcher at Universiti Brunei Darussalam & DAAD AInet Fellow in Knowledge Graphs, LLMs, and GNNs.',
-  ogDescription:
-    'PhD Researcher in AI at Universiti Brunei Darussalam & 2025 DAAD AInet Fellow · 367+ Citations · 32 Publications in Knowledge Graph Completion, Complex Networks & LLMs.',
+  ogDescription: `PhD Researcher in AI at Universiti Brunei Darussalam & 2025 DAAD AInet Fellow · ${PROFILE_INFO.metrics.citations}+ Citations · ${PROFILE_INFO.metrics.publications} Publications in Knowledge Graph Completion, Complex Networks & LLMs.`,
   keywords: [
     'Haji Gul',
     'AI Researcher',

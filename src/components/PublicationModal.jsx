@@ -47,7 +47,10 @@ export function PublicationModal({ publication, onClose }) {
         <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-5">
           <div>
             <p className="font-mono text-xs text-[#60A5FA] tabular-nums">
-              {publication.year} · {publication.venue} · {publication.citations} citations
+              {publication.year} · {publication.venue}
+              {publication.citations > 0
+                ? ` · ${publication.citations} ${publication.citations === 1 ? 'citation' : 'citations'}`
+                : ''}
             </p>
             <h3
               id="modal-paper-title"

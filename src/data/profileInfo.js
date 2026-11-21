@@ -18,7 +18,7 @@ export const PROFILE_INFO = {
     'School of Digital Science, Universiti Brunei Darussalam, Jalan Tungku Link, Gadong BE1410, Brunei Darussalam',
   scopusId: '57218363906',
   metrics: {
-    citations: 367,
+    citations: 376,
     hIndex: 10,
     i10Index: 11,
     publications: 32,

@@ -161,7 +161,7 @@ export function PublicationsSection({
               id="publication-search"
               value={searchQuery}
               onChange={onSearchChange}
-              placeholder="Search 32 papers by title, venue, year..."
+              placeholder={`Search ${PUBLICATIONS.length} papers by title, venue, year...`}
               ariaLabel="Search publications by title, venue, publisher, year, or keyword"
               buttonLabel="Search publications"
               testIdPrefix="pub-search"
@@ -264,9 +264,11 @@ export function PublicationsSection({
                                 <span aria-hidden="true" className="text-white/25">·</span>
                                 <span className="text-[#E2E8F0]">{pub.venue}</span>
                               </div>
-                              <span className="text-[#93C5FD]">
-                                {pub.citations} citations
-                              </span>
+                              {pub.citations > 0 && (
+                                <span className="text-[#93C5FD]">
+                                  {pub.citations} {pub.citations === 1 ? 'citation' : 'citations'}
+                                </span>
+                              )}
                             </div>
 
                             <h3 className="mt-3 text-xl font-bold leading-snug text-[#F8FAFC] sm:text-2xl">
@@ -375,9 +377,11 @@ export function PublicationsSection({
                             <span aria-hidden="true" className="text-white/25">·</span>
                             <span className="text-[#C4CCD6]">{pub.venue}</span>
                           </div>
-                          <span className="text-[#94A3B8]">
-                            {pub.citations} citations
-                          </span>
+                          {pub.citations > 0 && (
+                            <span className="text-[#94A3B8]">
+                              {pub.citations} {pub.citations === 1 ? 'citation' : 'citations'}
+                            </span>
+                          )}
                         </div>
 
                         <h3 className="mt-2.5 text-base font-semibold leading-snug text-[#F3F5F8] sm:text-lg">

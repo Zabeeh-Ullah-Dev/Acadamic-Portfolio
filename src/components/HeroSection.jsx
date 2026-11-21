@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowDown,
   ArrowUpRight,
@@ -62,14 +62,34 @@ function useTypewriterRole(roles = HERO_ROLE_TITLES) {
   return activePhrase.slice(0, state.charCount);
 }
 
-export function HeroSection({ onExplorePaper }) {
+export function HeroSection({ onExplorePaper, metricsReady = true }) {
   const [imgError, setImgError] = useState(false);
   const [copiedTarget, setCopiedTarget] = useState(null);
   const [activeSpotlightIndex, setActiveSpotlightIndex] = useState(0);
   const [spotlightPaused, setSpotlightPaused] = useState(false);
   const [portraitTilt, setPortraitTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 40 });
+  const [metricReplays, setMetricReplays] = useState({
+    citations: 0,
+    hIndex: 0,
+    i10Index: 0,
+    publications: 0,
+    videos: 0,
+  });
+  const lastReplayTimeRef = useRef({});
   const typedRole = useTypewriterRole(HERO_ROLE_TITLES);
   const primaryCopyEmail = getPrimaryCopyEmail(PROFILE_INFO);
+
+  const handleMetricHover = (metricKey) => {
+    if (!metricsReady) return;
+    const now = performance.now();
+    const last = lastReplayTimeRef.current[metricKey] ?? 0;
+    if (now - last < 900) return;
+    lastReplayTimeRef.current[metricKey] = now;
+    setMetricReplays((prev) => ({
+      ...prev,
+      [metricKey]: (prev[metricKey] ?? 0) + 1,
+    }));
+  };
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia?.(
@@ -119,7 +139,7 @@ export function HeroSection({ onExplorePaper }) {
     {
       id: 'scholar',
       label: 'Scholar',
-      ariaLabel: 'Google Scholar (367+ citations)',
+      ariaLabel: `Google Scholar (${PROFILE_INFO.metrics.citations}+ citations)`,
       href: PROFILE_INFO.links.scholar,
       Icon: GoogleScholarIcon,
       metric: `${PROFILE_INFO.metrics.citations}+`,
@@ -160,7 +180,7 @@ export function HeroSection({ onExplorePaper }) {
     {
       id: 'youtube',
       label: 'YouTube',
-      ariaLabel: 'YouTube Channel & 219+ Video Lectures',
+      ariaLabel: `YouTube Channel & ${PROFILE_INFO.metrics.videos}+ Video Lectures`,
       href: PROFILE_INFO.links.youtube,
       Icon: YouTubeIcon,
       metric: `${PROFILE_INFO.metrics.videos}+`,
@@ -603,7 +623,11 @@ export function HeroSection({ onExplorePaper }) {
           />
 
           <div className="grid grid-cols-2 divide-y divide-white/8 sm:grid-cols-5 sm:divide-x sm:divide-y-0 sm:divide-white/10">
-            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+            <div
+              data-testid="metric-card-citations"
+              onMouseEnter={() => handleMetricHover('citations')}
+              className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
@@ -615,13 +639,19 @@ export function HeroSection({ onExplorePaper }) {
                 <AnimatedCounter
                   target={PROFILE_INFO.metrics.citations}
                   suffix="+"
-                  duration={1600}
+                  duration={1500}
+                  start={metricsReady}
+                  replayKey={metricReplays.citations}
                 />
               </p>
               <p className="mt-0.5 text-xs text-[#728097]">Google Scholar</p>
             </div>
 
-            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+            <div
+              data-testid="metric-card-hindex"
+              onMouseEnter={() => handleMetricHover('hIndex')}
+              className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
@@ -632,13 +662,19 @@ export function HeroSection({ onExplorePaper }) {
               <p className="mt-1 font-mono text-2xl font-semibold text-[#F8FAFC] tabular-nums sm:text-[1.85rem]">
                 <AnimatedCounter
                   target={PROFILE_INFO.metrics.hIndex}
-                  duration={1200}
+                  duration={1100}
+                  start={metricsReady}
+                  replayKey={metricReplays.hIndex}
                 />
               </p>
               <p className="mt-0.5 text-xs text-[#728097]">Impact Index</p>
             </div>
 
-            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+            <div
+              data-testid="metric-card-i10index"
+              onMouseEnter={() => handleMetricHover('i10Index')}
+              className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
@@ -649,13 +685,19 @@ export function HeroSection({ onExplorePaper }) {
               <p className="mt-1 font-mono text-2xl font-semibold text-[#F8FAFC] tabular-nums sm:text-[1.85rem]">
                 <AnimatedCounter
                   target={PROFILE_INFO.metrics.i10Index}
-                  duration={1300}
+                  duration={1200}
+                  start={metricsReady}
+                  replayKey={metricReplays.i10Index}
                 />
               </p>
               <p className="mt-0.5 text-xs text-[#728097]">10+ Cited Papers</p>
             </div>
 
-            <div className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5">
+            <div
+              data-testid="metric-card-publications"
+              onMouseEnter={() => handleMetricHover('publications')}
+              className="group relative px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:px-5 sm:py-5"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
@@ -666,13 +708,19 @@ export function HeroSection({ onExplorePaper }) {
               <p className="mt-1 font-mono text-2xl font-semibold text-[#60A5FA] tabular-nums sm:text-[1.85rem]">
                 <AnimatedCounter
                   target={PROFILE_INFO.metrics.publications}
-                  duration={1400}
+                  duration={1300}
+                  start={metricsReady}
+                  replayKey={metricReplays.publications}
                 />
               </p>
               <p className="mt-0.5 text-xs text-[#728097]">2020 – 2026</p>
             </div>
 
-            <div className="group relative col-span-2 px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:col-span-1 sm:px-5 sm:py-5">
+            <div
+              data-testid="metric-card-videos"
+              onMouseEnter={() => handleMetricHover('videos')}
+              className="group relative col-span-2 px-4 py-4 transition-colors duration-200 hover:bg-[#172554]/28 sm:col-span-1 sm:px-5 sm:py-5"
+            >
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-[#3B82F6] to-[#38BDF8] transition-transform duration-300 group-hover:scale-x-100"
@@ -684,7 +732,9 @@ export function HeroSection({ onExplorePaper }) {
                 <AnimatedCounter
                   target={PROFILE_INFO.metrics.videos}
                   suffix="+"
-                  duration={1700}
+                  duration={1600}
+                  start={metricsReady}
+                  replayKey={metricReplays.videos}
                 />
               </p>
               <a

@@ -1124,7 +1124,10 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
                           {pub.title}
                         </span>
                         <span className="mt-1 block font-mono text-[11px] text-[#8B95A5] tabular-nums">
-                          {pub.year} · {pub.venue} · {pub.citations} citations
+                          {pub.year} · {pub.venue}
+                          {pub.citations > 0
+                            ? ` · ${pub.citations} ${pub.citations === 1 ? 'citation' : 'citations'}`
+                            : ''}
                         </span>
                       </span>
                       <ArrowRight

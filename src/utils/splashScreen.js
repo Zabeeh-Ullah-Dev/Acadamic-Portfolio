@@ -1,3 +1,5 @@
+import { PROFILE_INFO } from '../data/profileInfo.js';
+
 export const SPLASH_PROFILE = {
   name: 'Haji Gul',
   avatarUrl: '/assets/aistudio/image_f655c344.png',
@@ -10,10 +12,10 @@ export const SPLASH_PROFILE = {
 };
 
 export const SPLASH_HIGHLIGHTS = [
-  { value: '32', label: 'Publications' },
-  { value: '367+', label: 'Citations' },
-  { value: '10', label: 'h-index' },
-  { value: '219+', label: 'Lectures' },
+  { value: String(PROFILE_INFO.metrics.publications), label: 'Publications' },
+  { value: `${PROFILE_INFO.metrics.citations}+`, label: 'Citations' },
+  { value: String(PROFILE_INFO.metrics.hIndex), label: 'h-index' },
+  { value: `${PROFILE_INFO.metrics.videos}+`, label: 'Lectures' },
 ];
 
 /**
@@ -46,7 +48,9 @@ export function computeSplashProgress(elapsedMs, totalDurationMs = SPLASH_PROFIL
  */
 export function getSplashStatusLabel(progress = 0) {
   if (progress >= 92) return 'Entering research portfolio';
-  if (progress >= 55) return 'Mapping 32 publications & open-source code';
+  if (progress >= 55) {
+    return `Mapping ${PROFILE_INFO.metrics.publications} publications & open-source code`;
+  }
   return 'Initializing knowledge graph & AI research archive';
 }
 

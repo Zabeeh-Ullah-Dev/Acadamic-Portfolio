@@ -9,6 +9,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 import { Navbar } from './components/Navbar';
 import { SectionDivider } from './components/SectionDivider';
 import { syncDocumentSeoUrls } from './utils/seoMeta';
+import { shouldSkipSplash } from './utils/splashScreen';
 
 // Code-split below-the-fold sections to keep First Paint, LCP & TBT ultra-fast
 const loadResearchSection = () =>
@@ -160,6 +161,9 @@ function DeferredSection({
 }
 
 export default function App() {
+  const [heroReady, setHeroReady] = useState(() =>
+    typeof window !== 'undefined' ? shouldSkipSplash(window.location.search) : true
+  );
   const [category, setCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState('year-desc');
@@ -324,10 +328,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0C0F14] text-[#F3F5F8]">
-      <LoadingScreen />
+      <LoadingScreen onComplete={() => setHeroReady(true)} />
       <Navbar />
       <main>
-        <HeroSection onExplorePaper={handleExplorePaper} />
+        <HeroSection onExplorePaper={handleExplorePaper} metricsReady={heroReady} />
         <SectionDivider />
         <DeferredSection
           id="research"
