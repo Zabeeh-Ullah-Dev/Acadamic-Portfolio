@@ -7,17 +7,45 @@ export function getPrimaryCopyEmail(profileInfo) {
 }
 
 /**
+ * Checks whether the async Clipboard API is available and permitted by the
+ * current browsing context / iframe Permissions-Policy, avoiding Chromium
+ * console policy-violation errors before falling back to textarea copy.
+ */
+export function canUseAsyncClipboard(
+  nav = typeof navigator !== 'undefined' ? navigator : undefined,
+  win = typeof window !== 'undefined' ? window : undefined,
+  doc = typeof document !== 'undefined' ? document : undefined
+) {
+  if (!nav?.clipboard || typeof nav.clipboard.writeText !== 'function') {
+    return false;
+  }
+
+  if (win && win.isSecureContext === false) {
+    return false;
+  }
+
+  const policy = doc?.permissionsPolicy || doc?.featurePolicy;
+  if (policy && typeof policy.allowsFeature === 'function') {
+    try {
+      if (policy.allowsFeature('clipboard-write') === false) {
+        return false;
+      }
+    } catch {
+      // Ignore non-standard Permissions-Policy implementations
+    }
+  }
+
+  return true;
+}
+
+/**
  * Copies text to clipboard using the modern async Clipboard API with a
  * resilient execCommand fallback for restricted iframe contexts.
  */
 export async function copyTextToClipboard(text) {
   if (!text) return false;
 
-  if (
-    typeof navigator !== 'undefined' &&
-    navigator.clipboard &&
-    typeof navigator.clipboard.writeText === 'function'
-  ) {
+  if (canUseAsyncClipboard()) {
     try {
       await navigator.clipboard.writeText(text);
       return true;

@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PROFILE_INFO } from '../data/profileInfo';
-import { getPrimaryCopyEmail, copyTextToClipboard } from './clipboard';
+import {
+  canUseAsyncClipboard,
+  copyTextToClipboard,
+  getPrimaryCopyEmail,
+} from './clipboard';
 
 test('getPrimaryCopyEmail returns the personal email rather than the academic email', () => {
   const email = getPrimaryCopyEmail(PROFILE_INFO);
@@ -15,6 +19,34 @@ test('getPrimaryCopyEmail falls back gracefully when personal email is missing',
     'user@uni.edu'
   );
   assert.equal(getPrimaryCopyEmail(null), '');
+});
+
+test('canUseAsyncClipboard returns false when blocked by Permissions-Policy or insecure context', () => {
+  const mockNav = { clipboard: { writeText: async () => {} } };
+  assert.equal(
+    canUseAsyncClipboard(
+      mockNav,
+      { isSecureContext: true },
+      { permissionsPolicy: { allowsFeature: (name) => name !== 'clipboard-write' } }
+    ),
+    false
+  );
+  assert.equal(
+    canUseAsyncClipboard(
+      mockNav,
+      { isSecureContext: false },
+      { permissionsPolicy: { allowsFeature: () => true } }
+    ),
+    false
+  );
+  assert.equal(
+    canUseAsyncClipboard(
+      mockNav,
+      { isSecureContext: true },
+      { permissionsPolicy: { allowsFeature: () => true } }
+    ),
+    true
+  );
 });
 
 test('copyTextToClipboard writes the exact personal email via navigator.clipboard', async () => {

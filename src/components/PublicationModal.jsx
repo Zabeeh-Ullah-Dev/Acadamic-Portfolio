@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Copy, Check, ExternalLink } from 'lucide-react';
+import { copyTextToClipboard } from '../utils/clipboard';
 import { GitHubIcon, GoogleScholarIcon } from './BrandIcons';
 import { PublicationSchematic } from './PublicationSchematic';
 
 export function PublicationModal({ publication, onClose }) {
   const [copiedBibtex, setCopiedBibtex] = useState(false);
+  const copyTimerRef = useRef(0);
 
   useEffect(() => {
     setCopiedBibtex(false);
@@ -17,17 +19,25 @@ export function PublicationModal({ publication, onClose }) {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (copyTimerRef.current) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
   }, [publication, onClose]);
 
   if (!publication) return null;
 
   const handleCopyBibtex = async () => {
-    try {
-      await navigator.clipboard.writeText(publication.bibtex);
+    const ok = await copyTextToClipboard(publication.bibtex);
+    if (copyTimerRef.current) {
+      window.clearTimeout(copyTimerRef.current);
+    }
+    if (ok) {
       setCopiedBibtex(true);
-      window.setTimeout(() => setCopiedBibtex(false), 2200);
-    } catch {
+      copyTimerRef.current = window.setTimeout(() => setCopiedBibtex(false), 2200);
+    } else {
       setCopiedBibtex(false);
     }
   };

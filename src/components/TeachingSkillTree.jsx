@@ -10,6 +10,7 @@ import {
   groupCoursesByTier,
 } from '../utils/academicGame';
 import { CourseCard } from './CourseCard';
+import { CourseDependencyDiagram } from './CourseDependencyDiagram';
 import { CourseInspector } from './CourseInspector';
 
 const COURSE_TRACKS = [
@@ -24,6 +25,8 @@ export function TeachingSkillTree() {
   const [selectedTrack, setSelectedTrack] = useState('All Subjects');
   const [activePathwayId, setActivePathwayId] = useState(null);
   const [activeCourseId, setActiveCourseId] = useState('c-1');
+  const [diagramOpen, setDiagramOpen] = useState(false);
+  const [gridReturnKey, setGridReturnKey] = useState(0);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const activePathway = useMemo(
@@ -90,14 +93,29 @@ export function TeachingSkillTree() {
 
   const handleCardSelect = useCallback(
     (courseId, options = {}) => {
-      handleSelectCourse(courseId, { ...options, openDrawerOnMobile: true });
+      handleSelectCourse(courseId, { ...options, openDrawerOnMobile: false });
+      setMobileDrawerOpen(false);
+      setDiagramOpen(true);
     },
     [handleSelectCourse]
   );
 
+  const handleDiagramSelectCourse = useCallback(
+    (courseId) => {
+      handleSelectCourse(courseId, { keepPathway: false, openDrawerOnMobile: false });
+    },
+    [handleSelectCourse]
+  );
+
+  const handleResetDiagram = useCallback(() => {
+    setDiagramOpen(false);
+    setGridReturnKey((prev) => prev + 1);
+  }, []);
+
   const handleTrackChange = (track) => {
     setSelectedTrack(track);
     setActivePathwayId(null);
+    setDiagramOpen(false);
     const pool =
       track === 'All Subjects'
         ? SUBJECTS_TAUGHT.courses
@@ -115,6 +133,7 @@ export function TeachingSkillTree() {
       }
       setActivePathwayId(pathway.id);
       setSelectedTrack('All Subjects');
+      setDiagramOpen(false);
       const capstoneId = pathway.courseIds[pathway.courseIds.length - 1];
       setActiveCourseId(capstoneId);
     },
@@ -258,26 +277,43 @@ export function TeachingSkillTree() {
             )}
           </div>
 
-          {/* Mobile Quick Syllabus Trigger */}
-          <button
-            type="button"
-            data-testid="open-course-drawer-mobile"
-            onClick={() => setMobileDrawerOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-[#60A5FA]/40 bg-[#172554]/45 px-3 py-1.5 font-mono text-xs font-medium text-[#93C5FD] transition-colors hover:border-[#60A5FA]/75 hover:text-white lg:hidden"
-          >
-            <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Inspect {activeProfile.code}</span>
-          </button>
+          {/* Mobile Quick Syllabus Trigger (only in Grid View) */}
+          {!diagramOpen && (
+            <button
+              type="button"
+              data-testid="open-course-drawer-mobile"
+              onClick={() => setMobileDrawerOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg border border-[#60A5FA]/40 bg-[#172554]/45 px-3 py-1.5 font-mono text-xs font-medium text-[#93C5FD] transition-colors hover:border-[#60A5FA]/75 hover:text-white lg:hidden"
+            >
+              <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Inspect {activeProfile.code}</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Asymmetric Split Layout: 4-Tier Progression Grid (Left 7) + Sticky Syllabus Inspector (Right 5) */}
-      <div className="mt-7 grid grid-cols-1 items-start gap-7 lg:grid-cols-12">
-        {/* Left 7 Cols: Tier-Grouped Academic Progression (L1 Foundation -> L4 Specialization) */}
+      {diagramOpen ? (
+        <CourseDependencyDiagram
+          activeProfile={activeProfile}
+          activeTierNum={activeTierNum}
+          activeTopics={activeTopics}
+          activeChain={activeChain}
+          onSelectCourse={handleDiagramSelectCourse}
+          onReset={handleResetDiagram}
+        />
+      ) : (
+        /* Asymmetric Split Layout: 4-Tier Progression Grid (Left 7) + Sticky Syllabus Inspector (Right 5) */
         <div
-          data-testid="subjects-taught-grid"
-          className="relative space-y-6 lg:col-span-7"
+          key={`grid-${gridReturnKey}`}
+          className={`mt-7 grid grid-cols-1 items-start gap-7 lg:grid-cols-12 ${
+            gridReturnKey > 0 ? 'animate-grid-return' : ''
+          }`}
         >
+          {/* Left 7 Cols: Tier-Grouped Academic Progression (L1 Foundation -> L4 Specialization) */}
+          <div
+            data-testid="subjects-taught-grid"
+            className="relative space-y-6 lg:col-span-7"
+          >
           {tierGroups.map((group, groupIndex) => {
             const isLastGroup = groupIndex === tierGroups.length - 1;
             const hasActiveInTier = group.courses.some(
@@ -360,17 +396,18 @@ export function TeachingSkillTree() {
           })}
         </div>
 
-        {/* Right 5 Cols: Sticky Desktop Inspector + Mobile Slide-Up Drawer */}
-        <CourseInspector
-          activeProfile={activeProfile}
-          activeTierNum={activeTierNum}
-          activeTopics={activeTopics}
-          activeChain={activeChain}
-          mobileDrawerOpen={mobileDrawerOpen}
-          onCloseMobileDrawer={handleCloseMobileDrawer}
-          onSelectCourse={handleSelectCourse}
-        />
-      </div>
+          {/* Right 5 Cols: Sticky Desktop Inspector + Mobile Slide-Up Drawer */}
+          <CourseInspector
+            activeProfile={activeProfile}
+            activeTierNum={activeTierNum}
+            activeTopics={activeTopics}
+            activeChain={activeChain}
+            mobileDrawerOpen={mobileDrawerOpen}
+            onCloseMobileDrawer={handleCloseMobileDrawer}
+            onSelectCourse={handleCardSelect}
+          />
+        </div>
+      )}
     </section>
   );
 }

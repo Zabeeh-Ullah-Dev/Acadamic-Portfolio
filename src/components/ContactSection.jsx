@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
   ArrowUpRight,
@@ -14,6 +14,7 @@ import {
   Send,
 } from 'lucide-react';
 import { ACADEMIC_REFERENCES, PROFILE_INFO } from '../data/portfolioData';
+import { copyTextToClipboard } from '../utils/clipboard';
 import {
   buildFormattedInquiry,
   buildMailtoHref,
@@ -32,13 +33,25 @@ export function ContactSection() {
   const [formErrors, setFormErrors] = useState({});
   const [hasManualRecipient, setHasManualRecipient] = useState(false);
   const [submittedValues, setSubmittedValues] = useState(null);
+  const copyTimerRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async (key, value) => {
-    try {
-      await navigator.clipboard.writeText(value);
+    const ok = await copyTextToClipboard(value);
+    if (copyTimerRef.current) {
+      window.clearTimeout(copyTimerRef.current);
+    }
+    if (ok) {
       setCopiedKey(key);
-      window.setTimeout(() => setCopiedKey(null), 2000);
-    } catch {
+      copyTimerRef.current = window.setTimeout(() => setCopiedKey(null), 2000);
+    } else {
       setCopiedKey(null);
     }
   };
