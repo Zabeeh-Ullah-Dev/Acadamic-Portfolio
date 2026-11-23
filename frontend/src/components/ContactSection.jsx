@@ -116,7 +116,7 @@ export function ContactSection() {
               06. Correspondence & Verification
             </p>
             <h2 className="mt-2.5 text-3xl font-bold tracking-tight text-[#F3F5F8] sm:text-4xl">
-              Contact & Academic References
+              Contact &amp; References
             </h2>
             <p className="mt-3 text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
               Open to research collaborations in Knowledge Graph Completion, AI automation workflows, Complex Networks, and invited academic lectures.
@@ -732,10 +732,10 @@ export function ContactSection() {
             </div>
           </div>
 
-          {/* Academic References (Clean 3-Column Editorial Band) */}
+          {/* References (Clean 3-Column Editorial Band) */}
           <div className="mt-14 border-t border-white/10 pt-10">
             <h3 className="text-lg font-semibold text-[#F3F5F8]">
-              Verified Academic References
+              References
             </h3>
             <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
               {ACADEMIC_REFERENCES.map((ref) => (

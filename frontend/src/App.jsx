@@ -50,9 +50,13 @@ const loadAcademicProfileSection = () =>
   import('./components/AcademicProfileSection').then((m) => ({
     default: m.AcademicProfileSection,
   }));
-const loadHonorsAndLecturesSection = () =>
-  import('./components/HonorsAndLecturesSection').then((m) => ({
-    default: m.HonorsAndLecturesSection,
+const loadHonorsSection = () =>
+  import('./components/HonorsSection').then((m) => ({
+    default: m.HonorsSection,
+  }));
+const loadLecturesSection = () =>
+  import('./components/LecturesSection').then((m) => ({
+    default: m.LecturesSection,
   }));
 const loadContactSection = () =>
   import('./components/ContactSection').then((m) => ({
@@ -74,7 +78,8 @@ const PublicationsSection = lazy(loadPublicationsSection);
 const OpenSourceSection = lazy(loadOpenSourceSection);
 const TimelineSection = lazy(loadTimelineSection);
 const AcademicProfileSection = lazy(loadAcademicProfileSection);
-const HonorsAndLecturesSection = lazy(loadHonorsAndLecturesSection);
+const HonorsSection = lazy(loadHonorsSection);
+const LecturesSection = lazy(loadLecturesSection);
 const ContactSection = lazy(loadContactSection);
 const Footer = lazy(loadFooter);
 const PublicationModal = lazy(loadPublicationModal);
@@ -91,7 +96,7 @@ const HASH_TO_SECTION_KEY = {
   teaching: 'academic-profile',
   service: 'academic-profile',
   honors: 'honors',
-  lectures: 'honors',
+  lectures: 'lectures',
   contact: 'contact',
 };
 
@@ -101,7 +106,8 @@ const SECTION_LOADERS = {
   projects: loadOpenSourceSection,
   experience: loadTimelineSection,
   'academic-profile': loadAcademicProfileSection,
-  honors: loadHonorsAndLecturesSection,
+  honors: loadHonorsSection,
+  lectures: loadLecturesSection,
   contact: loadContactSection,
   footer: loadFooter,
 };
@@ -489,6 +495,19 @@ export default function App() {
                       </div>
                     </div>
                   </section>
+
+                  {/* Home Page Featured Sections: Projects, Honors, Contact & References */}
+                  <div className="border-t border-white/10">
+                    <OpenSourceSection />
+                  </div>
+
+                  <div className="border-t border-white/10">
+                    <HonorsSection />
+                  </div>
+
+                  <div className="border-t border-white/10">
+                    <ContactSection />
+                  </div>
                 </>
               )}
 
@@ -553,14 +572,14 @@ export default function App() {
               {/* DEDICATED HONORS & AWARDS PAGE */}
               {currentRoute === 'honors' && (
                 <div className="py-6 sm:py-10">
-                  <HonorsAndLecturesSection />
+                  <HonorsSection />
                 </div>
               )}
 
               {/* DEDICATED VIDEO LECTURES PAGE */}
               {currentRoute === 'lectures' && (
                 <div className="py-6 sm:py-10">
-                  <HonorsAndLecturesSection />
+                  <LecturesSection />
                 </div>
               )}
 

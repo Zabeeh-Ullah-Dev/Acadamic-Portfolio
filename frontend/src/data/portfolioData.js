@@ -68,6 +68,7 @@ export const PUBLICATIONS = [
       'Integrates structural neighborhood cues alongside textual entity semantics.',
     ],
     keywords: ['Knowledge Graph Completion', 'BERT', 'Multi-Context', 'PAKDD'],
+    paperUrl: 'https://doi.org/10.1007/978-981-96-3636-5_3',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:R3hNpaxXUhUC',
     bibtex: `@inproceedings{gul2025mucokgc,
@@ -100,6 +101,7 @@ export const PUBLICATIONS = [
       'Balances local biological pathway density with language model representations.',
     ],
     keywords: ['Drug-Target Prediction', 'BioNLP', 'Biomedical KG', 'ACL', 'AdaptiveBotsLab'],
+    paperUrl: 'https://aclanthology.org/2025.bionlp-1.27/',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:blknAaTinKkC',
     githubUrl:
@@ -166,6 +168,7 @@ export const PUBLICATIONS = [
       'Supports weighted criteria tailored to latency-critical or recall-critical tasks.',
     ],
     keywords: ['KG-EDAS', 'Meta-Metric Benchmarking', 'IEEE BigData', 'Evaluation'],
+    paperUrl: 'https://doi.org/10.1109/BigData62323.2024.10825313',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:ns9cj8rnVeAC',
     githubUrl: 'https://github.com/hajigul/KG-EDAS-IEEE_BigData',
@@ -199,6 +202,7 @@ export const PUBLICATIONS = [
       'Bridges spectral graph theory and semantic relation diversity.',
     ],
     keywords: ['Spectral Graph Complexity', 'Link Prediction', 'Knowledge Graphs', 'IEEE BigData'],
+    paperUrl: 'https://doi.org/10.1109/BigData62323.2024.10825708',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:RGFaLdJalmkC',
     githubUrl:
@@ -482,6 +486,7 @@ export const PUBLICATIONS = [
       'Achieves superior AUC over classical Common Neighbors and Katz baselines.',
     ],
     keywords: ['Link Prediction', 'Local Paths', 'Complex Networks', 'Physica A'],
+    paperUrl: 'https://doi.org/10.1016/j.physa.2020.124980',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:u-x6o8ySG0sC',
     bibtex: `@article{aziz2020localpaths,
@@ -516,6 +521,7 @@ export const PUBLICATIONS = [
       'Tested on Yeast PPI, C. elegans, E. coli, Karate, and Dolphins networks.',
     ],
     keywords: ['Link Prediction', 'Scientific Reports', 'Complex Networks', 'Local Similarity'],
+    paperUrl: 'https://doi.org/10.1038/s41598-020-77942-0',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:2osOgNQ5qMEC',
     githubUrl: 'https://github.com/hajigul/Link-Prediction-2021',
