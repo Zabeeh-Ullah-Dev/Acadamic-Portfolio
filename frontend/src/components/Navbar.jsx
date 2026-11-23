@@ -11,6 +11,8 @@ const TRACKED_SECTION_IDS = [
   'experience',
   'education',
   'academic-profile',
+  'service',
+  'certifications',
   'honors',
   'lectures',
   'contact',

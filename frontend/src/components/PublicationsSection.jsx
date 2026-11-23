@@ -401,59 +401,76 @@ export function PublicationsSection({
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4">
               {otherPapers.map((pub) => {
                 const targetUrl = pub.paperUrl || pub.scholarUrl;
                 return (
                   <article
                     key={pub.id}
-                    className="group flex flex-col md:flex-row md:items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-xl border border-white/10 bg-[#0E131C]/90 hover:bg-[#141C2A] hover:border-[#3B82F6]/50 transition-all duration-200"
+                    className="group rounded-2xl border border-white/10 bg-[#0E131C]/90 p-5 transition-all duration-200 hover:border-[#3B82F6]/50 hover:bg-[#131A26]"
                   >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="font-mono text-xs text-[#60A5FA] font-bold shrink-0">
-                        {pub.year}
-                      </span>
-                      <span className="text-white/20 hidden sm:inline">|</span>
-                      <a
-                        href={targetUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-[#F3F5F8] group-hover:text-[#60A5FA] truncate transition-colors inline-flex items-center gap-1.5"
-                        title={`Open published paper: ${pub.title}`}
-                      >
-                        <span className="truncate">{pub.title}</span>
-                        <ExternalLink className="w-3.5 h-3.5 shrink-0 opacity-70 group-hover:opacity-100 text-[#60A5FA]" />
-                      </a>
+                    <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                      {/* Paper Name / Title (Clickable) */}
+                      <h4 className="text-base font-semibold leading-snug sm:text-lg">
+                        <a
+                          href={targetUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#F3F5F8] group-hover:text-[#60A5FA] transition-colors inline-flex items-center gap-1.5 hover:underline"
+                          title={`Open published paper: ${pub.title}`}
+                        >
+                          <span>{pub.title}</span>
+                          <ExternalLink className="h-4 w-4 shrink-0 text-[#60A5FA] opacity-75 group-hover:opacity-100" />
+                        </a>
+                      </h4>
+
+                      <div className="flex items-center gap-2 font-mono text-xs text-[#8B95A5] shrink-0">
+                        <span className="font-semibold text-[#60A5FA]">{pub.year}</span>
+                        <span aria-hidden="true" className="text-white/25">·</span>
+                        <span className="text-[#C4CCD6]">{pub.venue}</span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0 text-xs font-mono">
-                      <span className="text-slate-400 hidden lg:inline truncate max-w-[200px]">
-                        {pub.venue}
-                      </span>
-                      <span className="text-slate-500 hidden xl:inline">
-                        ({pub.publisher})
-                      </span>
-                      {pub.citations > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[#93C5FD]">
-                          {pub.citations} cit.
+                    {/* Under Paper Name: Little idea about paper */}
+                    <p className="mt-2 text-sm leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
+                      <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#60A5FA]">
+                        Idea:
+                      </span>{' '}
+                      {pub.abstract}
+                    </p>
+
+                    {/* Metadata & Direct Links */}
+                    <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3 text-xs">
+                      <div className="flex flex-wrap items-center gap-2 text-[#94A3B8]">
+                        <span className="font-mono uppercase tracking-wider text-[#64748B]">
+                          Publisher:
                         </span>
-                      )}
-                      <a
-                        href={targetUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 rounded-lg bg-[#2563EB]/20 border border-[#3B82F6]/40 text-[#93C5FD] hover:bg-[#2563EB] hover:text-white transition-colors flex items-center gap-1"
-                      >
-                        <span>Visit Paper</span>
-                        <ArrowUpRight className="w-3 h-3" />
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => onSelectPublication(pub)}
-                        className="px-2.5 py-1 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:border-white/25 transition-colors"
-                      >
-                        BibTeX
-                      </button>
+                        <span className="text-[#E2E8F0]">{pub.publisher}</span>
+                        {pub.citations > 0 && (
+                          <span className="ml-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 font-mono text-[11px] text-[#93C5FD]">
+                            {pub.citations} {pub.citations === 1 ? 'citation' : 'citations'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={targetUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 rounded-lg border border-[#3B82F6]/50 bg-[#2563EB]/20 px-3 py-1 font-semibold text-[#93C5FD] transition-colors hover:border-[#60A5FA] hover:bg-[#2563EB] hover:text-white"
+                        >
+                          <span>Visit Paper</span>
+                          <ArrowUpRight className="h-3 w-3" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => onSelectPublication(pub)}
+                          className="rounded-lg border border-white/10 px-2.5 py-1 text-slate-400 transition-colors hover:border-white/25 hover:text-white cursor-pointer"
+                        >
+                          BibTeX
+                        </button>
+                      </div>
                     </div>
                   </article>
                 );

@@ -16,6 +16,7 @@ import {
   Layers,
   Mail,
   Network,
+  ShieldCheck,
   Sparkles,
   Video,
 } from 'lucide-react';
@@ -50,6 +51,14 @@ const loadAcademicProfileSection = () =>
   import('./components/AcademicProfileSection').then((m) => ({
     default: m.AcademicProfileSection,
   }));
+const loadAcademicServiceSection = () =>
+  import('./components/AcademicServiceSection').then((m) => ({
+    default: m.AcademicServiceSection,
+  }));
+const loadCertificationsSection = () =>
+  import('./components/CertificationsSection').then((m) => ({
+    default: m.CertificationsSection,
+  }));
 const loadHonorsSection = () =>
   import('./components/HonorsSection').then((m) => ({
     default: m.HonorsSection,
@@ -78,6 +87,8 @@ const PublicationsSection = lazy(loadPublicationsSection);
 const OpenSourceSection = lazy(loadOpenSourceSection);
 const TimelineSection = lazy(loadTimelineSection);
 const AcademicProfileSection = lazy(loadAcademicProfileSection);
+const AcademicServiceSection = lazy(loadAcademicServiceSection);
+const CertificationsSection = lazy(loadCertificationsSection);
 const HonorsSection = lazy(loadHonorsSection);
 const LecturesSection = lazy(loadLecturesSection);
 const ContactSection = lazy(loadContactSection);
@@ -89,12 +100,17 @@ const HASH_TO_SECTION_KEY = {
   research: 'research',
   publications: 'publications',
   projects: 'projects',
+  code: 'projects',
   experience: 'experience',
-  education: 'experience',
+  employment: 'experience',
+  education: 'education',
   'academic-profile': 'academic-profile',
+  profile: 'academic-profile',
   skills: 'academic-profile',
   teaching: 'academic-profile',
-  service: 'academic-profile',
+  service: 'service',
+  'academic-service': 'service',
+  certifications: 'certifications',
   honors: 'honors',
   lectures: 'lectures',
   contact: 'contact',
@@ -106,6 +122,8 @@ const SECTION_LOADERS = {
   projects: loadOpenSourceSection,
   experience: loadTimelineSection,
   'academic-profile': loadAcademicProfileSection,
+  service: loadAcademicServiceSection,
+  certifications: loadCertificationsSection,
   honors: loadHonorsSection,
   lectures: loadLecturesSection,
   contact: loadContactSection,
@@ -208,9 +226,12 @@ const PAGE_TITLES = {
   education: '05 // Education & Degrees',
   'academic-profile': '06 // Academic Profile & Teaching',
   profile: '06 // Academic Profile & Teaching',
-  honors: '07 // Honors, Awards & Certifications',
-  lectures: '08 // YouTube Video Lectures',
-  contact: '09 // Contact & Collaboration',
+  service: '07 // Academic Service & Reviewer Board',
+  'academic-service': '07 // Academic Service & Reviewer Board',
+  certifications: '08 // Technical Certifications',
+  honors: '09 // Honors & Awards',
+  lectures: '10 // YouTube Video Lectures',
+  contact: '11 // Contact & References',
 };
 
 export default function App() {
@@ -430,16 +451,24 @@ export default function App() {
                           },
                           {
                             id: 'academic-profile',
-                            title: 'Academic Profile & Teaching',
-                            desc: 'Syllabus topics, academic service, reviewing, and technical skill graph.',
+                            title: 'Academic Profile & Skills',
+                            desc: 'Subjects taught, course progression graph, and technical engineering stack.',
                             icon: Layers,
                             color: 'text-sky-400 border-sky-500/30 group-hover:border-sky-400/60',
                             badge: 'Pedagogy',
                           },
                           {
-                            id: 'honors',
-                            title: 'Honors & Certifications',
-                            desc: 'DAAD AInet fellowship award, university merits & verified credentials.',
+                            id: 'service',
+                            title: 'Academic Service',
+                            desc: 'Peer-review service across IEEE, ACM, Springer journals & conference technical program committees.',
+                            icon: ShieldCheck,
+                            color: 'text-emerald-400 border-emerald-500/30 group-hover:border-emerald-400/60',
+                            badge: 'Peer Review',
+                          },
+                          {
+                            id: 'certifications',
+                            title: 'Technical Certifications',
+                            desc: 'Verified DeepLearning.AI, IBM, and Google Cloud credentials with certificate previews.',
                             icon: Award,
                             color: 'text-amber-400 border-amber-500/30 group-hover:border-amber-400/60',
                             badge: 'Credentials',
@@ -451,14 +480,6 @@ export default function App() {
                             icon: Video,
                             color: 'text-rose-400 border-rose-500/30 group-hover:border-rose-400/60',
                             badge: 'YouTube',
-                          },
-                          {
-                            id: 'contact',
-                            title: 'Contact & Collaboration',
-                            desc: 'Academic inquiries, joint research collaborations, speaker invitations & CV request.',
-                            icon: Mail,
-                            color: 'text-cyan-400 border-cyan-500/30 group-hover:border-cyan-400/60',
-                            badge: 'Get in Touch',
                           },
                         ].map((card) => {
                           const CardIcon = card.icon;
@@ -496,9 +517,9 @@ export default function App() {
                     </div>
                   </section>
 
-                  {/* Home Page Featured Sections: Projects, Honors, Contact & References */}
+                  {/* Home Page Featured Sections: Projects (6 projects), Honors, Contact & References */}
                   <div className="border-t border-white/10">
-                    <OpenSourceSection />
+                    <OpenSourceSection isHomePage={true} onNavigate={navigateToRoute} />
                   </div>
 
                   <div className="border-t border-white/10">
@@ -541,24 +562,24 @@ export default function App() {
                 </div>
               )}
 
-              {/* DEDICATED OPEN SOURCE & PROJECTS PAGE */}
+              {/* DEDICATED OPEN SOURCE & CODE PAGE (ALL PROJECTS) */}
               {(currentRoute === 'projects' || currentRoute === 'code') && (
                 <div className="py-6 sm:py-10">
-                  <OpenSourceSection />
+                  <OpenSourceSection isHomePage={false} onNavigate={navigateToRoute} />
                 </div>
               )}
 
-              {/* DEDICATED EMPLOYMENT DETAILS PAGE */}
+              {/* DEDICATED EMPLOYMENT DETAILS PAGE (ONLY EMPLOYMENT) */}
               {(currentRoute === 'experience' || currentRoute === 'employment' || currentRoute === 'timeline') && (
                 <div className="py-6 sm:py-10">
-                  <TimelineSection />
+                  <TimelineSection mode="experience" />
                 </div>
               )}
 
-              {/* DEDICATED EDUCATION PAGE */}
+              {/* DEDICATED EDUCATION PAGE (ONLY EDUCATION) */}
               {currentRoute === 'education' && (
                 <div className="py-6 sm:py-10">
-                  <TimelineSection />
+                  <TimelineSection mode="education" />
                 </div>
               )}
 
@@ -566,6 +587,20 @@ export default function App() {
               {(currentRoute === 'academic-profile' || currentRoute === 'profile') && (
                 <div className="py-6 sm:py-10">
                   <AcademicProfileSection />
+                </div>
+              )}
+
+              {/* DEDICATED ACADEMIC SERVICE PAGE */}
+              {(currentRoute === 'service' || currentRoute === 'academic-service') && (
+                <div className="py-6 sm:py-10">
+                  <AcademicServiceSection />
+                </div>
+              )}
+
+              {/* DEDICATED TECHNICAL CERTIFICATIONS PAGE */}
+              {currentRoute === 'certifications' && (
+                <div className="py-6 sm:py-10">
+                  <CertificationsSection />
                 </div>
               )}
 

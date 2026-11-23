@@ -261,33 +261,14 @@ export function HonorsSection() {
                     </div>
 
                     <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-3 text-xs">
-                      {cert.hasPreviewModal ? (
-                        <button
-                          type="button"
-                          onClick={() => setActiveCertificate(cert)}
-                          className="inline-flex items-center gap-1.5 font-semibold text-[#60A5FA] transition-colors hover:text-[#93C5FD]"
-                        >
-                          <Eye className="h-3.5 w-3.5" />
-                          <span>View Certificate</span>
-                        </button>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-[#8B95A5]">
-                          <Lock className="h-3 w-3" />
-                          <span>
-                            {isStanford
-                              ? 'Stanford Online Credential'
-                              : isMichigan
-                              ? 'Michigan Course Certificate'
-                              : isDeepLearning
-                              ? 'DeepLearning.AI Certificate'
-                              : isVanderbilt
-                              ? 'Vanderbilt Certificate'
-                              : isAlberta
-                              ? 'Alberta Course Certificate'
-                              : 'Online Credential'}
-                          </span>
-                        </span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveCertificate(cert)}
+                        className="inline-flex items-center gap-1.5 font-semibold text-[#60A5FA] transition-colors hover:text-[#93C5FD] cursor-pointer"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                        <span>Show Certificate</span>
+                      </button>
 
                       <a
                         href={cert.verifyUrl ?? cert.credentialUrl}
@@ -343,9 +324,9 @@ export function HonorsSection() {
             </div>
 
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0A0D12] sm:aspect-[16/10]">
-              {!modalImageError && activeCertificate.image ? (
+              {!modalImageError && (activeCertificate.imageUrl || activeCertificate.image) ? (
                 <img
-                  src={activeCertificate.image}
+                  src={activeCertificate.imageUrl || activeCertificate.image}
                   alt={`${activeCertificate.title} certificate issued by ${activeCertificate.issuer}`}
                   onError={() => setModalImageError(true)}
                   className="h-full w-full object-contain p-4"

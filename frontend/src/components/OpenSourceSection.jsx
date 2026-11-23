@@ -25,7 +25,7 @@ import { ExpandableSearch } from './ExpandableSearch';
 
 const INITIAL_VISIBLE_REPOS = 2;
 
-export function OpenSourceSection() {
+export function OpenSourceSection({ isHomePage = false, onNavigate }) {
   const portfolioData = usePortfolioData();
   const OPEN_SOURCE_PROJECTS = portfolioData?.projects || DEFAULT_PROJECTS;
 
@@ -38,25 +38,21 @@ export function OpenSourceSection() {
         category: activeCategory,
         searchQuery: query,
       }),
-    [activeCategory, query]
+    [activeCategory, query, OPEN_SOURCE_PROJECTS]
   );
 
   const filterActive = isOpenSourceFilterActive({
     category: activeCategory,
     searchQuery: query,
-    showAll: false,
+    showAll: !isHomePage,
   });
 
-  const visibleProjects = useMemo(
-    () =>
-      getVisibleOpenSourceProjects(filteredProjects, {
-        category: activeCategory,
-        searchQuery: query,
-        showAll: false,
-        initialLimit: INITIAL_VISIBLE_REPOS,
-      }),
-    [filteredProjects, activeCategory, query]
-  );
+  const visibleProjects = useMemo(() => {
+    if (isHomePage) {
+      return filteredProjects.slice(0, 6);
+    }
+    return filteredProjects; // On dedicated Code page, show all projects
+  }, [filteredProjects, isHomePage]);
 
   const handleReset = () => {
     setActiveCategory('all');
@@ -83,10 +79,17 @@ export function OpenSourceSection() {
               Project &amp; Open-Source Research Code
             </h2>
             <p className="mt-3 text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
-              Highlighting 2 flagship open-source codebases below — search or select any research group to inspect all {OPEN_SOURCE_PROJECTS.length} curated suites from{' '}
-              <span className="font-mono text-sm text-[#93C5FD]">@hajigul</span>{' '}
-              and{' '}
-              <span className="font-mono text-sm text-[#93C5FD]">AdaptiveBotsLab</span>.
+              {isHomePage ? (
+                <>
+                  Highlighting 6 flagship open-source research codebases and benchmark suites below. Explore the complete collection of {OPEN_SOURCE_PROJECTS.length} repositories on GitHub.
+                </>
+              ) : (
+                <>
+                  Showing all {OPEN_SOURCE_PROJECTS.length} open-source research codebases, algorithm implementations, and benchmarking suites from{' '}
+                  <span className="font-mono text-sm text-[#93C5FD]">@hajigul</span> and{' '}
+                  <span className="font-mono text-sm text-[#93C5FD]">AdaptiveBotsLab</span>.
+                </>
+              )}
             </p>
           </div>
 
@@ -396,28 +399,28 @@ export function OpenSourceSection() {
 
         {/* Clean Single-CTA GitHub Archive Footer */}
         {filteredProjects.length > 0 && (
-          <div className="mt-10 flex flex-col items-center gap-3 text-center">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
             <a
               href={`${PROFILE_INFO.links.github}?tab=repositories`}
               target="_blank"
               rel="noopener noreferrer"
               data-testid="oss-github-cta"
-              className="hover-sheen group relative inline-flex min-h-[48px] items-center gap-3 rounded-xl border border-[#3B82F6]/45 bg-gradient-to-b from-[#1E3A8A]/45 via-[#141E33]/90 to-[#0C121D]/95 px-7 py-3 text-sm font-semibold text-[#F3F5F8] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.2),0_14px_30px_-8px_rgba(37,99,235,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#60A5FA] hover:shadow-[inset_0_1px_0_rgba(147,197,253,0.35),0_18px_38px_-8px_rgba(37,99,235,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+              className="hover-sheen group relative inline-flex min-h-[48px] items-center gap-3 rounded-xl border border-[#3B82F6]/60 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-950/60 transition-all duration-300 hover:-translate-y-0.5 hover:from-[#3B82F6] hover:to-[#2563EB]"
             >
-              <GitHubIcon className="icon-spring h-4 w-4 shrink-0 text-[#60A5FA] group-hover:text-white" />
-              <span className="tracking-wide">
-                View All Repositories on GitHub
-              </span>
-              <span className="font-mono text-xs font-semibold tabular-nums text-[#93C5FD] group-hover:text-white">
-                {OPEN_SOURCE_PROJECTS.length}+
-              </span>
-              <ArrowUpRight className="icon-nudge-ne h-4 w-4 shrink-0 text-[#93C5FD] group-hover:text-white" />
+              <GitHubIcon className="h-4 w-4 shrink-0 text-white" />
+              <span>Explore All Projects on GitHub</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-white" />
             </a>
 
-            {!filterActive && (
-              <p className="font-mono text-xs text-[#8B95A5]">
-                Showing 2 featured codebases · Use search or select any category above to explore all {OPEN_SOURCE_PROJECTS.length} repositories
-              </p>
+            {isHomePage && onNavigate && (
+              <button
+                type="button"
+                onClick={() => onNavigate('projects')}
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-6 py-3 text-sm font-medium text-slate-300 hover:text-white hover:border-[#3B82F6] transition-colors cursor-pointer"
+              >
+                <span>View All in Code Archive ({OPEN_SOURCE_PROJECTS.length})</span>
+                <ArrowUpRight className="h-4 w-4 text-[#60A5FA]" />
+              </button>
             )}
           </div>
         )}

@@ -64,9 +64,9 @@ export const PRIMARY_NAV_ITEMS = [
   { label: 'Employment', href: '#/experience', id: 'experience' },
   { label: 'Education', href: '#/education', id: 'education' },
   { label: 'Profile', href: '#/academic-profile', id: 'academic-profile' },
-  { label: 'Honors', href: '#/honors', id: 'honors' },
+  { label: 'Academic Service', href: '#/service', id: 'service' },
+  { label: 'Certifications', href: '#/certifications', id: 'certifications' },
   { label: 'Lectures', href: '#/lectures', id: 'lectures' },
-  { label: 'Contact', href: '#/contact', id: 'contact' },
 ];
 
 export function mapSectionIdToNavId(sectionId) {

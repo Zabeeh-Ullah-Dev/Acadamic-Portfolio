@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { TECHNICAL_SKILLS_STACK } from '../data/portfolioData';
 import { ResearchBentoCard } from './ResearchBentoCard';
-import { ServiceReviewerBoard } from './ServiceReviewerBoard';
 import { SkillMatrix } from './SkillMatrix';
 import { TeachingSkillTree } from './TeachingSkillTree';
 import {
@@ -223,10 +222,7 @@ export function AcademicProfileSection() {
         {/* Part 1: Subjects Taught & Course Progression */}
         <TeachingSkillTree />
 
-        {/* Part 2: Academic Service & Reviewer Board */}
-        <ServiceReviewerBoard />
-
-        {/* Part 3: Technical Skills & Core Stack */}
+        {/* Part 2: Technical Skills & Core Stack */}
         <section
           id="technical-skills"
           aria-labelledby="technical-skills-heading"

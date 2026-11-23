@@ -197,34 +197,42 @@ function TimelineColumn({
   );
 }
 
-export function TimelineSection() {
+export function TimelineSection({ mode = 'all' }) {
   const portfolioData = usePortfolioData();
   const EXPERIENCE_TIMELINE = portfolioData?.experience || DEFAULT_EXPERIENCE;
   const EDUCATION_TIMELINE = portfolioData?.education || DEFAULT_EDUCATION;
 
   const [sectionRef, revealed] = useScrollReveal({ threshold: 0.06 });
-  const [focusView, setFocusView] = useState('all');
+  const [focusView, setFocusView] = useState(() => {
+    if (mode === 'experience' || mode === 'employment') return 'experience';
+    if (mode === 'education') return 'education';
+    return 'all';
+  });
   const [activeEntryId, setActiveEntryId] = useState(null);
 
-  // Sync tab selection with external hash navigation (e.g. from navbar anchor clicks)
+  // Sync tab selection with external hash navigation if mode is 'all'
   useEffect(() => {
+    if (mode !== 'all') {
+      if (mode === 'experience' || mode === 'employment') setFocusView('experience');
+      if (mode === 'education') setFocusView('education');
+      return;
+    }
+
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash === '#education') {
         setFocusView('education');
-      } else if (hash === '#experience') {
+      } else if (hash === '#experience' || hash === '#employment') {
         setFocusView('experience');
       } else if (hash === '#timeline') {
         setFocusView('all');
       }
     };
 
-    // Initial check on page load if direct hash was provided
     handleHashChange();
-
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [mode]);
 
   const handleTabClick = (tabId) => {
     setFocusView(tabId);
@@ -237,11 +245,14 @@ export function TimelineSection() {
     }
   };
 
+  const isStrictExperience = mode === 'experience' || mode === 'employment' || focusView === 'experience';
+  const isStrictEducation = mode === 'education' || focusView === 'education';
+
   return (
     <section
       id="timeline"
       ref={sectionRef}
-      className="section-defer relative overflow-hidden bg-[#0C0F14] py-20 sm:py-24"
+      className="section-defer relative overflow-hidden bg-[#0C0F14] py-16 sm:py-20"
     >
       <div
         aria-hidden="true"
@@ -256,55 +267,69 @@ export function TimelineSection() {
         >
           <div className="max-w-2xl">
             <p className="font-mono text-xs font-medium tracking-[0.04em] text-[#60A5FA]">
-              03 // ACADEMIC TRAJECTORY
+              {mode === 'experience' || mode === 'employment'
+                ? '04 // EMPLOYMENT DETAILS'
+                : mode === 'education'
+                ? '05 // FORMAL EDUCATION'
+                : '03 // ACADEMIC TRAJECTORY'}
             </p>
             <h2 className="mt-2.5 text-3xl font-bold tracking-tight text-[#F3F5F8] sm:text-4xl">
-              Education & Research Experience
+              {mode === 'experience' || mode === 'employment'
+                ? 'Employment Details & Research Roles'
+                : mode === 'education'
+                ? 'Education & Academic Pedigree'
+                : 'Education & Research Experience'}
             </h2>
             <p className="mt-3 text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
-              A connected progression from mathematical graph theory and computer science lectureship to international AI and NLP fellowships.
+              {mode === 'experience' || mode === 'employment'
+                ? 'Academic faculty appointments, research fellowships, and university teaching trajectory across AI and Computer Science.'
+                : mode === 'education'
+                ? 'Doctoral AI studies at Universiti Brunei Darussalam alongside Master of Science and Bachelor of Science credentials.'
+                : 'A connected progression from mathematical graph theory and computer science lectureship to international AI and NLP fellowships.'}
             </p>
           </div>
 
-          <div
-            role="tablist"
-            aria-label="Filter trajectory view"
-            className="inline-flex flex-wrap items-center gap-1.5 self-start rounded-xl border border-white/12 bg-[#0C0F14]/80 p-1 md:self-end"
-          >
-            {[
-              { id: 'all', label: 'Full Trajectory' },
-              { id: 'experience', label: 'Employment History' },
-              { id: 'education', label: 'Education' },
-            ].map((tab) => {
-              const active = focusView === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#60A5FA] ${
-                    active
-                      ? 'bg-[#2563EB] text-white shadow-md shadow-blue-950/60 ring-1 ring-[#60A5FA]/40'
-                      : 'text-[#94A3B8] hover:bg-white/[0.04] hover:text-[#F3F5F8]'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+          {mode === 'all' && (
+            <div
+              role="tablist"
+              aria-label="Filter trajectory view"
+              className="inline-flex flex-wrap items-center gap-1.5 self-start rounded-xl border border-white/12 bg-[#0C0F14]/80 p-1 md:self-end"
+            >
+              {[
+                { id: 'all', label: 'Full Trajectory' },
+                { id: 'experience', label: 'Employment History' },
+                { id: 'education', label: 'Education' },
+              ].map((tab) => {
+                const active = focusView === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => handleTabClick(tab.id)}
+                    className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#60A5FA] ${
+                      active
+                        ? 'bg-[#2563EB] text-white shadow-md shadow-blue-950/60 ring-1 ring-[#60A5FA]/40'
+                        : 'text-[#94A3B8] hover:bg-white/[0.04] hover:text-[#F3F5F8]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div
           className={`relative mt-12 grid grid-cols-1 gap-12 transition-all duration-300 ${
-            focusView === 'all'
+            focusView === 'all' && mode === 'all'
               ? 'lg:grid-cols-[1fr_auto_1fr] lg:gap-8 items-stretch'
-              : 'lg:grid-cols-1'
+              : 'lg:grid-cols-1 max-w-4xl mx-auto'
           }`}
         >
-          {(focusView === 'all' || focusView === 'experience') && (
+          {((focusView === 'all' && mode === 'all') || isStrictExperience) && (
             <div
               id="experience"
               className={`scroll-mt-24 ${
@@ -322,7 +347,7 @@ export function TimelineSection() {
             </div>
           )}
 
-          {focusView === 'all' && (
+          {focusView === 'all' && mode === 'all' && (
             <>
               {/* Subtle animated vertical gradient line for desktop (2050 design aesthetic) */}
               <div className="hidden lg:flex items-center justify-center self-stretch">
@@ -336,7 +361,7 @@ export function TimelineSection() {
             </>
           )}
 
-          {(focusView === 'all' || focusView === 'education') && (
+          {((focusView === 'all' && mode === 'all') || isStrictEducation) && (
             <div
               id="education"
               className={`scroll-mt-24 ${
