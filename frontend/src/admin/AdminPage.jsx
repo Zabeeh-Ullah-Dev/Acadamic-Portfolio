@@ -12,7 +12,11 @@ export function AdminPage({ onGoToSite }) {
 
     getCurrentAdmin().then((user) => {
       if (mounted) {
-        setAdminUser(user);
+        if (user) {
+          setAdminUser(user);
+        } else if (typeof window !== 'undefined' && sessionStorage.getItem('portfolio_local_admin') === '1') {
+          setAdminUser({ email: 'local-admin@portfolio.local', isLocal: true });
+        }
         setCheckingAuth(false);
       }
     });
@@ -43,7 +47,13 @@ export function AdminPage({ onGoToSite }) {
   if (!adminUser) {
     return (
       <AdminLogin
-        onLoginSuccess={() => getCurrentAdmin().then(setAdminUser)}
+        onLoginSuccess={(localUser) => {
+          if (localUser) {
+            setAdminUser(localUser);
+          } else {
+            getCurrentAdmin().then(setAdminUser);
+          }
+        }}
         onBackToSite={onGoToSite}
       />
     );
@@ -51,7 +61,12 @@ export function AdminPage({ onGoToSite }) {
 
   return (
     <AdminDashboard
-      onLogout={() => setAdminUser(null)}
+      onLogout={() => {
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('portfolio_local_admin');
+        }
+        setAdminUser(null);
+      }}
       onGoToSite={onGoToSite}
     />
   );

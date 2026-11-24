@@ -158,11 +158,18 @@ CREATE TABLE IF NOT EXISTS public.portfolio_certifications (
   issuer TEXT NOT NULL,
   "issuedDate" TEXT,
   "credentialId" TEXT,
+  "credentialUrl" TEXT,
   "verificationUrl" TEXT,
+  "imageUrl" TEXT,
+  "logoUrl" TEXT,
   skills JSONB DEFAULT '[]'::JSONB,
   order_num INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE public.portfolio_certifications ADD COLUMN IF NOT EXISTS "logoUrl" TEXT;
+ALTER TABLE public.portfolio_certifications ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+ALTER TABLE public.portfolio_certifications ADD COLUMN IF NOT EXISTS "credentialUrl" TEXT;
 
 -- 10. ENABLE ROW-LEVEL SECURITY (RLS)
 ALTER TABLE public.portfolio_profile ENABLE ROW LEVEL SECURITY;

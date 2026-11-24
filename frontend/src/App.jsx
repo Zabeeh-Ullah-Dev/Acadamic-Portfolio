@@ -368,7 +368,12 @@ export default function App() {
 
                   <SectionDivider />
 
-                  <OpenSourceSection variant="home" initialLimit={6} showAllByDefault={false} />
+                  <OpenSourceSection
+                    variant="home"
+                    initialLimit={6}
+                    showAllByDefault={false}
+                    onViewAll={() => navigateToRoute('projects')}
+                  />
 
                   <SectionDivider />
 

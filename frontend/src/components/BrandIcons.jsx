@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 export function GoogleScholarIcon(props) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -126,8 +128,14 @@ export function CourseraLogoMark(props) {
   );
 }
 
-export function InstituteBadge({ issuer, size = 'md' }) {
-  const lower = issuer.toLowerCase();
+export function InstituteBadge({ issuer = '', logoUrl = '', size = 'md' }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  useEffect(() => {
+    setImgFailed(false);
+  }, [logoUrl]);
+
+  const lower = String(issuer || '').toLowerCase();
   const boxClass =
     size === 'sm'
       ? 'h-8 w-8 rounded-lg p-1'
@@ -145,9 +153,21 @@ export function InstituteBadge({ issuer, size = 'md' }) {
   return (
     <span
       title={issuer}
-      className={`inline-flex shrink-0 items-center justify-center bg-white shadow-[0_4px_12px_rgba(0,0,0,0.3)] ring-1 ring-black/10 ${boxClass}`}
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden bg-white shadow-[0_4px_12px_rgba(0,0,0,0.3)] ring-1 ring-black/10 ${boxClass}`}
     >
-      {mark}
+      {logoUrl && !imgFailed ? (
+        <img
+          src={logoUrl}
+          alt={`${issuer || 'Company'} logo`}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setImgFailed(true)}
+          className="h-full w-full object-contain"
+        />
+      ) : (
+        mark
+      )}
     </span>
   );
 }

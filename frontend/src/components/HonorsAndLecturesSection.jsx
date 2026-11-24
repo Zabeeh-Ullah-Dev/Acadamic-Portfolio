@@ -276,7 +276,7 @@ export function HonorsAndLecturesSection({ mode = 'all' }) {
                     <div className="relative p-5 sm:p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex min-w-0 items-center gap-3.5">
-                          <InstituteBadge issuer={cert.issuer} />
+                          <InstituteBadge issuer={cert.issuer} logoUrl={cert.logoUrl} />
 
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-xs text-[#8B95A5]">
@@ -365,7 +365,10 @@ export function HonorsAndLecturesSection({ mode = 'all' }) {
           >
             <div className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 px-5 py-4 sm:px-6">
               <div className="flex min-w-0 items-center gap-3.5">
-                <InstituteBadge issuer={activeCertificate.issuer} />
+                <InstituteBadge
+                  issuer={activeCertificate.issuer}
+                  logoUrl={activeCertificate.logoUrl}
+                />
                 <div className="min-w-0">
                   <p className="truncate font-mono text-xs text-[#60A5FA]">
                     {activeCertificate.issuedDate} · {activeCertificate.issuer}
@@ -583,6 +586,28 @@ export function HonorsAndLecturesSection({ mode = 'all' }) {
                 </a>
               );
             })}
+          </div>
+
+          {/* Bottom Channel CTA */}
+          <div className="mt-12 flex flex-col items-center gap-3.5 border-t border-white/10 pt-10 text-center">
+            <p className="text-sm text-[#94A3B8]">
+              Explore all 219+ full-length lectures, tutorials, and upcoming AI playlists on YouTube.
+            </p>
+            <a
+              href={PROFILE_INFO.links.youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="lectures-bottom-channel-cta"
+              className="hover-sheen group relative inline-flex min-h-[46px] items-center gap-3 overflow-hidden rounded-xl border border-[#3B82F6]/45 bg-gradient-to-b from-[#172554]/55 via-[#111827]/95 to-[#0B0F18]/95 px-6 py-2.5 text-sm font-medium text-[#F1F5F9] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.22),0_12px_28px_-10px_rgba(37,99,235,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#60A5FA]/80 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/75 to-transparent"
+              />
+              <YouTubeIcon className="h-4.5 w-4.5 shrink-0 text-[#60A5FA] transition-colors group-hover:text-white" />
+              <span className="tracking-[0.01em]">Visit YouTube Channel (@hajigul5733)</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-[#60A5FA] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+            </a>
           </div>
         </div>
       </section>

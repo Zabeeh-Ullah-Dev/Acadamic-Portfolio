@@ -258,17 +258,77 @@ function mapDbCertToLocal(dbCert) {
   }
   if (!Array.isArray(skills)) skills = [];
 
+  const fallback = INITIAL_CERTS.find((c) => c.id === dbCert.id) || {};
+  const verifyHref =
+    dbCert.verifyUrl ||
+    dbCert.verify_url ||
+    dbCert.verificationUrl ||
+    dbCert.verification_url ||
+    dbCert.credentialUrl ||
+    dbCert.credential_url ||
+    fallback.verifyUrl ||
+    fallback.credentialUrl ||
+    '';
+
   return {
     id: dbCert.id,
-    title: dbCert.title || '',
-    issuer: dbCert.issuer || '',
-    issuedDate: dbCert.issuedDate || dbCert.issued_date || '',
-    credentialId: dbCert.credentialId || dbCert.credential_id || '',
-    credentialUrl: dbCert.credentialUrl || dbCert.credential_url || '',
-    verifyUrl: dbCert.verifyUrl || dbCert.verify_url || dbCert.credentialUrl || '',
-    imageUrl: dbCert.imageUrl || dbCert.image_url || '/assets/portfolio/image_f8574988.png',
+    title: dbCert.title || fallback.title || '',
+    issuer: dbCert.issuer || fallback.issuer || '',
+    issuedDate: dbCert.issuedDate || dbCert.issued_date || fallback.issuedDate || '',
+    credentialId: dbCert.credentialId || dbCert.credential_id || fallback.credentialId || '',
+    credentialUrl:
+      dbCert.credentialUrl ||
+      dbCert.credential_url ||
+      verifyHref ||
+      fallback.credentialUrl ||
+      '',
+    verifyUrl: verifyHref,
+    verificationUrl: verifyHref,
+    imageUrl:
+      dbCert.imageUrl ||
+      dbCert.image_url ||
+      fallback.imageUrl ||
+      '/assets/portfolio/image_f8574988.png',
+    logoUrl:
+      dbCert.logoUrl ||
+      dbCert.logo_url ||
+      dbCert.company_logo_url ||
+      fallback.logoUrl ||
+      '',
     skills,
   };
+}
+
+function getInitialCertifications() {
+  if (typeof window === 'undefined') return INITIAL_CERTS;
+  try {
+    const cached = localStorage.getItem('portfolio_certifications_override');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(mapDbCertToLocal);
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read cached certifications override', e);
+  }
+  return INITIAL_CERTS;
+}
+
+function getInitialHonors() {
+  if (typeof window === 'undefined') return INITIAL_HONORS;
+  try {
+    const cached = localStorage.getItem('portfolio_honors_override');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(mapDbHonorToLocal);
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read cached honors override', e);
+  }
+  return INITIAL_HONORS;
 }
 
 function mapDbPillarToLocal(dbPillar) {
@@ -325,19 +385,33 @@ export function PortfolioDataProvider({ children }) {
   const [lectures, setLectures] = useState(INITIAL_LECTURES);
   const [pillars, setPillars] = useState(INITIAL_PILLARS);
   const [projects, setProjects] = useState(INITIAL_PROJECTS);
-  const [honors, setHonors] = useState(INITIAL_HONORS);
-  const [certifications, setCertifications] = useState(INITIAL_CERTS);
+  const [honors, setHonors] = useState(getInitialHonors);
+  const [certifications, setCertifications] = useState(getInitialCertifications);
   const [isLoading, setIsLoading] = useState(isSupabaseConfigured);
   const [isLiveFromDb, setIsLiveFromDb] = useState(false);
 
   const reloadData = useCallback(async () => {
-    // If local storage has override, ensure it's loaded
+    // Hydrate local storage overrides so local admin edits take effect immediately
     if (typeof window !== 'undefined') {
       try {
         const cached = localStorage.getItem('portfolio_profile_override');
         if (cached) {
           const parsed = JSON.parse(cached);
           setProfile((prev) => mapDbProfileToLocal(parsed, prev));
+        }
+        const cachedCerts = localStorage.getItem('portfolio_certifications_override');
+        if (cachedCerts) {
+          const parsedCerts = JSON.parse(cachedCerts);
+          if (Array.isArray(parsedCerts)) {
+            setCertifications(parsedCerts.map(mapDbCertToLocal));
+          }
+        }
+        const cachedHonors = localStorage.getItem('portfolio_honors_override');
+        if (cachedHonors) {
+          const parsedHonors = JSON.parse(cachedHonors);
+          if (Array.isArray(parsedHonors)) {
+            setHonors(parsedHonors.map(mapDbHonorToLocal));
+          }
         }
       } catch (e) {
         // no-op

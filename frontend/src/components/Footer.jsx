@@ -104,8 +104,8 @@ export function Footer({ onNavigate }) {
       />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-7 lg:flex-row lg:items-center lg:gap-4">
-          {/* Identity Anchor */}
+        {/* Row 1: Brand Identity + Uncrowded Social Media Dock */}
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <a
             href="#/"
             onClick={(e) => {
@@ -115,45 +115,24 @@ export function Footer({ onNavigate }) {
               }
             }}
             aria-label="Haji Gul — Home"
-            className="group inline-flex shrink-0 items-center gap-3 self-start focus-visible:outline-2 focus-visible:outline-[#3B82F6] lg:self-auto"
+            className="group inline-flex shrink-0 items-center gap-3 self-start focus-visible:outline-2 focus-visible:outline-[#3B82F6] sm:self-auto"
           >
             <HajiGulLogo className="h-8 w-auto shrink-0 transition-transform duration-200 group-hover:scale-[1.03]" />
             <div>
               <p className="text-sm font-semibold tracking-tight text-[#F3F5F8] transition-colors group-hover:text-[#60A5FA]">
                 {PROFILE_INFO.name}
               </p>
-              <p className="text-[11.5px] text-[#8B95A5]">
+              <p className="text-xs text-[#8B95A5]">
                 School of Digital Science · Universiti Brunei Darussalam
               </p>
             </div>
           </a>
 
-          {/* Minimalist Quick Links */}
-          <nav
-            aria-label="Footer navigation"
-            className="flex flex-wrap items-center gap-x-3.5 gap-y-2 text-xs font-medium text-[#94A3B8] lg:flex-nowrap"
-          >
-            {FOOTER_QUICK_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => {
-                  if (onNavigate) {
-                    e.preventDefault();
-                    onNavigate(link.id);
-                  }
-                }}
-                className="relative py-1 whitespace-nowrap transition-colors duration-150 hover:text-[#60A5FA] focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          {/* Tactile Social Media Icon Dock with Hover-Only Spring Motion */}
+          {/* Tactile Social Media Icon Dock — Always Inside Viewport & Properly Spaced */}
           <div
+            data-testid="footer-social-dock"
             aria-label="Academic and social profiles"
-            className="flex shrink-0 flex-wrap items-center gap-1.5 lg:flex-nowrap"
+            className="flex flex-wrap items-center gap-2 sm:justify-end"
           >
             {FOOTER_SOCIALS.map(
               ({
@@ -174,10 +153,10 @@ export function Footer({ onNavigate }) {
                   {...(external
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}
-                  className={`hover-sheen group relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/12 bg-white/[0.03] text-[#94A3B8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.95] focus-visible:outline-2 focus-visible:outline-[#3B82F6] ${hoverBorder} ${hoverBg} ${hoverText} ${hoverShadow}`}
+                  className={`hover-sheen group relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/12 bg-white/[0.03] text-[#94A3B8] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.95] focus-visible:outline-2 focus-visible:outline-[#3B82F6] ${hoverBorder} ${hoverBg} ${hoverText} ${hoverShadow}`}
                 >
                   <Icon
-                    className="icon-spring h-3.5 w-3.5 shrink-0"
+                    className="icon-spring h-4 w-4 shrink-0"
                     aria-hidden="true"
                   />
                 </a>
@@ -186,18 +165,36 @@ export function Footer({ onNavigate }) {
           </div>
         </div>
 
-        {/* Bottom Copyright & Quiet Metadata Line */}
-        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/8 pt-6 text-xs text-[#687385] sm:flex-row sm:items-center">
-          <div className="flex flex-wrap items-center gap-3">
-            <p data-testid="footer-copyright">
-              &copy; {currentYear} {PROFILE_INFO.name}. All rights reserved.
-            </p>
-          </div>
-          <div className="flex items-center gap-4 sm:pr-24">
-            <p className="font-mono text-[11px] text-[#687385]">
-              Knowledge Graph Completion · Spectral Complex Networks · LLMs
-            </p>
-          </div>
+        {/* Row 2: Dedicated Breathable Quick Navigation Row */}
+        <nav
+          aria-label="Footer navigation"
+          className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2.5 border-t border-white/8 pt-6 text-xs font-medium text-[#94A3B8]"
+        >
+          {FOOTER_QUICK_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={(e) => {
+                if (onNavigate) {
+                  e.preventDefault();
+                  onNavigate(link.id);
+                }
+              }}
+              className="relative py-1 whitespace-nowrap transition-colors duration-150 hover:text-[#60A5FA] focus-visible:outline-2 focus-visible:outline-[#3B82F6]"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+
+        {/* Row 3: Bottom Copyright & Quiet Metadata Line */}
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-white/8 pt-6 text-xs text-[#687385] sm:flex-row sm:items-center">
+          <p data-testid="footer-copyright">
+            &copy; {currentYear} {PROFILE_INFO.name}. All rights reserved.
+          </p>
+          <p className="font-mono text-[11px] text-[#687385]">
+            Knowledge Graph Completion · Spectral Complex Networks · LLMs
+          </p>
         </div>
       </div>
     </footer>

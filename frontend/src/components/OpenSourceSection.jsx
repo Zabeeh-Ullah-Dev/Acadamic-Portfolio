@@ -27,6 +27,7 @@ export function OpenSourceSection({
   initialLimit = 6,
   showAllByDefault = false,
   variant = 'page',
+  onViewAll,
 } = {}) {
   const portfolioData = usePortfolioData();
   const OPEN_SOURCE_PROJECTS = portfolioData?.projects || DEFAULT_PROJECTS;
@@ -398,31 +399,70 @@ export function OpenSourceSection({
           </div>
         )}
 
-        {/* Clean Single-CTA GitHub Archive Footer */}
+        {/* Clean Bottom CTA: Home navigates to Code page via View All; Code page links to GitHub */}
         {filteredProjects.length > 0 && (
-          <div className="mt-10 flex flex-col items-center gap-3 text-center">
-            <a
-              href={`${PROFILE_INFO.links.github}?tab=repositories`}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="oss-github-cta"
-              className="hover-sheen group relative inline-flex min-h-[48px] items-center gap-3 rounded-xl border border-[#3B82F6]/45 bg-gradient-to-b from-[#1E3A8A]/45 via-[#141E33]/90 to-[#0C121D]/95 px-7 py-3 text-sm font-semibold text-[#F3F5F8] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.2),0_14px_30px_-8px_rgba(37,99,235,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#60A5FA] hover:shadow-[inset_0_1px_0_rgba(147,197,253,0.35),0_18px_38px_-8px_rgba(37,99,235,0.5)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
-            >
-              <GitHubIcon className="icon-spring h-4 w-4 shrink-0 text-[#60A5FA] group-hover:text-white" />
-              <span className="tracking-wide">
-                {variant === 'home'
-                  ? 'Explore All Projects on GitHub'
-                  : 'Explore All Projects on GitHub'}
-              </span>
-              <span className="font-mono text-xs font-semibold tabular-nums text-[#93C5FD] group-hover:text-white">
-                {OPEN_SOURCE_PROJECTS.length}+
-              </span>
-              <ArrowUpRight className="icon-nudge-ne h-4 w-4 shrink-0 text-[#93C5FD] group-hover:text-white" />
-            </a>
+          <div className="mt-10 flex flex-col items-center gap-4 text-center">
+            {variant === 'home' && !showAllByDefault ? (
+              <div className="flex flex-wrap items-center justify-center gap-3.5">
+                <a
+                  href="#/projects"
+                  onClick={(e) => {
+                    if (onViewAll) {
+                      e.preventDefault();
+                      onViewAll();
+                    }
+                  }}
+                  data-testid="oss-view-all-btn"
+                  className="hover-sheen group relative inline-flex min-h-[46px] items-center gap-3 overflow-hidden rounded-xl border border-[#3B82F6]/45 bg-gradient-to-b from-[#172554]/55 via-[#111827]/95 to-[#0B0F18]/95 px-6 py-2.5 text-sm font-medium text-[#F1F5F9] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.22),0_12px_28px_-10px_rgba(37,99,235,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#60A5FA]/80 hover:text-white hover:shadow-[inset_0_1px_0_rgba(191,219,254,0.35),0_16px_36px_-10px_rgba(37,99,235,0.55)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/75 to-transparent"
+                  />
+                  <FolderGit2 className="h-4 w-4 shrink-0 text-[#60A5FA] transition-colors group-hover:text-[#93C5FD]" aria-hidden="true" />
+                  <span className="tracking-[0.01em]">View All Projects</span>
+                  <span className="font-mono text-xs tabular-nums text-[#93C5FD]/90">
+                    {OPEN_SOURCE_PROJECTS.length}
+                  </span>
+                  <ArrowUpRight className="icon-nudge-ne h-4 w-4 shrink-0 text-[#60A5FA] transition-colors group-hover:text-white" aria-hidden="true" />
+                </a>
+
+                <a
+                  href={`${PROFILE_INFO.links.github}?tab=repositories`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="oss-github-cta"
+                  className="group inline-flex min-h-[46px] items-center gap-2.5 rounded-xl border border-white/12 bg-white/[0.025] px-5 py-2.5 text-sm font-medium text-[#CBD5E1] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.05] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+                >
+                  <GitHubIcon className="h-4 w-4 shrink-0 text-[#94A3B8] transition-colors group-hover:text-[#60A5FA]" />
+                  <span>Explore on GitHub</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-[#64748B] transition-colors group-hover:text-[#93C5FD]" />
+                </a>
+              </div>
+            ) : (
+              <a
+                href={`${PROFILE_INFO.links.github}?tab=repositories`}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="oss-github-cta"
+                className="hover-sheen group relative inline-flex min-h-[46px] items-center gap-3 overflow-hidden rounded-xl border border-[#3B82F6]/45 bg-gradient-to-b from-[#172554]/55 via-[#111827]/95 to-[#0B0F18]/95 px-6 py-2.5 text-sm font-medium text-[#F1F5F9] backdrop-blur-md shadow-[inset_0_1px_0_rgba(147,197,253,0.22),0_12px_28px_-10px_rgba(37,99,235,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#60A5FA]/80 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+              >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#60A5FA]/75 to-transparent"
+                />
+                <GitHubIcon className="icon-spring h-4 w-4 shrink-0 text-[#60A5FA] group-hover:text-white" />
+                <span className="tracking-[0.01em]">Explore All Projects on GitHub</span>
+                <span className="font-mono text-xs tabular-nums text-[#93C5FD]/90">
+                  {OPEN_SOURCE_PROJECTS.length}+
+                </span>
+                <ArrowUpRight className="icon-nudge-ne h-4 w-4 shrink-0 text-[#60A5FA] group-hover:text-white" />
+              </a>
+            )}
 
             {!filterActive && !showAllByDefault && (
               <p className="font-mono text-xs text-[#8B95A5]">
-                Showing {visibleProjects.length} projects · Use search or open the Code page to browse all {OPEN_SOURCE_PROJECTS.length} repositories
+                Showing {visibleProjects.length} of {OPEN_SOURCE_PROJECTS.length} projects · Open Code page for the full repository suite
               </p>
             )}
           </div>

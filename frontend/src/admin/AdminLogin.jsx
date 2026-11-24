@@ -51,16 +51,31 @@ export function AdminLogin({ onLoginSuccess, onBackToSite }) {
           </div>
 
           {!isSupabaseConfigured && (
-            <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex gap-3">
-              <ShieldAlert className="w-5 h-5 shrink-0 text-amber-400" />
-              <div>
-                <p className="font-semibold mb-1">Supabase credentials required</p>
-                <p className="text-amber-300/80 leading-relaxed">
-                  Add <code className="bg-black/40 px-1 py-0.5 rounded text-amber-200">VITE_SUPABASE_URL</code> and{' '}
-                  <code className="bg-black/40 px-1 py-0.5 rounded text-amber-200">VITE_SUPABASE_ANON_KEY</code> to your{' '}
-                  <code className="bg-black/40 px-1 py-0.5 rounded text-amber-200">.env</code> file.
-                </p>
+            <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-3">
+              <div className="flex gap-3">
+                <ShieldAlert className="w-5 h-5 shrink-0 text-amber-400" />
+                <div>
+                  <p className="font-semibold mb-1">Local Admin Mode Available</p>
+                  <p className="text-amber-300/80 leading-relaxed">
+                    Supabase is not connected yet. You can still manage certifications, upload company PNG logos, and preview changes locally.
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                data-testid="enter-local-admin-btn"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('portfolio_local_admin', '1');
+                  }
+                  if (onLoginSuccess) {
+                    onLoginSuccess({ email: 'local-admin@portfolio.local', isLocal: true });
+                  }
+                }}
+                className="w-full py-2.5 px-4 rounded-xl border border-cyan-500/40 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 font-mono text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Open Local Admin Studio
+              </button>
             </div>
           )}
 
