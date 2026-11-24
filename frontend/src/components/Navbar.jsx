@@ -11,8 +11,6 @@ const TRACKED_SECTION_IDS = [
   'experience',
   'education',
   'academic-profile',
-  'service',
-  'certifications',
   'honors',
   'lectures',
   'contact',
@@ -20,7 +18,7 @@ const TRACKED_SECTION_IDS = [
 
 export function Navbar({ currentRoute = '', onNavigate }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const activeSection = currentRoute;
+  const activeSection = mapSectionIdToNavId(currentRoute) || currentRoute;
 
   const handleNavClick = (id) => {
     if (onNavigate) {
@@ -34,7 +32,7 @@ export function Navbar({ currentRoute = '', onNavigate }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 glass-surface">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         {/* Zone 1: Brand mark */}
         <a
           href="#/"
@@ -51,7 +49,7 @@ export function Navbar({ currentRoute = '', onNavigate }) {
         {/* Zone 2: Navigation Links */}
         <nav
           aria-label="Primary navigation"
-          className="hidden lg:flex items-center gap-3.5 xl:gap-5 text-[13px] font-medium"
+          className="hidden lg:flex items-center gap-3 xl:gap-4 text-[13px] font-medium"
         >
           {PRIMARY_NAV_ITEMS.map((item) => {
             const isActive = activeSection === item.id;

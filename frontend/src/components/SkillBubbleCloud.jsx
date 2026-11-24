@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Compass,
   Crosshair,
+  ExternalLink,
   Pause,
   Play,
   RotateCcw,
@@ -24,8 +25,16 @@ import {
   stepInertiaVelocity,
   stepRotationTowards,
 } from '../utils/skillCloud';
+import { getPaperHref } from '../utils/publicationsFilter';
 
-export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
+export function SkillBubbleCloud({
+  onSelectTopic,
+  onSelectPublication,
+  variant = 'research',
+  onLiveFilter,
+  onClearFilter,
+}) {
+  const isPublicationsVariant = variant === 'publications';
   const [activeDomain, setActiveDomain] = useState('all');
   const [selectedSkillId, setSelectedSkillId] = useState('skill-kgc');
   const [hoveredSkillId, setHoveredSkillId] = useState(null);
@@ -263,7 +272,7 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
 
   const handleSelectBubble = (
     skillId,
-    { focusSphere = true, engaged = true, isChainHop = false } = {}
+    { focusSphere = true, engaged = true, isChainHop = false, applyFilter = isPublicationsVariant } = {}
   ) => {
     const previousNode = SKILL_NODES.find((s) => s.id === selectedSkillId);
     const nextNode = SKILL_NODES.find((s) => s.id === skillId);
@@ -290,16 +299,47 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
     if (focusSphere) {
       glideToRotation(getTargetRotationForSkill(skillId));
     }
+    if (applyFilter && nextNode && onLiveFilter) {
+      onLiveFilter(
+        nextNode.publicationCategory,
+        nextNode.publicationSearchTerm,
+        nextNode.label
+      );
+    }
   };
 
   const handleDomainSelect = (nextDomain) => {
     setActiveDomain(nextDomain);
     const summary = getDomainSkillSummary(nextDomain);
-    if (nextDomain !== 'all' && summary.skills.length > 0) {
+    if (nextDomain === 'all') {
+      if (isPublicationsVariant && onClearFilter) {
+        onClearFilter();
+      }
+      return;
+    }
+    if (summary.skills.length > 0) {
       const targetSkill = summary.skills.some((s) => s.id === selectedSkillId)
         ? selectedSkillId
         : summary.skills[0].id;
-      handleSelectBubble(targetSkill, { focusSphere: true, engaged: true });
+      handleSelectBubble(targetSkill, {
+        focusSphere: true,
+        engaged: true,
+        applyFilter: false,
+      });
+      if (isPublicationsVariant && onLiveFilter) {
+        const domainCategoryMap = {
+          llms: 'kg-llm',
+          gnns: 'all',
+          ml: 'kg-llm',
+          biomedical: 'healthcare-cps',
+          engineering: 'link-prediction',
+        };
+        onLiveFilter(
+          domainCategoryMap[nextDomain] || 'all',
+          '',
+          summary.domain.label
+        );
+      }
     }
   };
 
@@ -409,6 +449,9 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
     setComboChain(1);
     glideToRotation(getTargetRotationForSkill('skill-kgc'));
     setIsAutoSpin(true);
+    if (isPublicationsVariant && onClearFilter) {
+      onClearFilter();
+    }
   };
 
   const handleNudgeRotate = (deltaYaw) => {
@@ -428,18 +471,29 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
   return (
     <div
       id="expertise-cloud"
-      className="mt-16 border-t border-white/10 pt-14"
+      data-testid="publications-3d-filter"
+      className={
+        isPublicationsVariant
+          ? 'mb-12 rounded-3xl border border-white/10 bg-[#0E131C]/80 p-5 sm:p-7'
+          : 'mt-16 border-t border-white/10 pt-14'
+      }
     >
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div className="max-w-2xl">
           <p className="font-mono text-xs font-medium text-[#60A5FA]">
-            Interactive 3D Expertise Sphere
+            {isPublicationsVariant
+              ? 'Interactive 3D Publication Filter'
+              : 'Interactive 3D Expertise Sphere'}
           </p>
           <h3 className="mt-2 text-2xl font-bold tracking-tight text-[#F3F5F8] sm:text-3xl">
-            Research Skill Constellation
+            {isPublicationsVariant
+              ? 'Filter Papers via 3D Research Sphere'
+              : 'Research Skill Constellation'}
           </h3>
           <p className="mt-2.5 text-sm leading-relaxed tracking-[0.01em] text-[#C4CCD6] sm:text-base">
-            Spin the 3D sphere, lock onto any skill orb to trigger connected edge waves, or chain across neighboring nodes to explore all {SKILL_NODES.length} core competencies.
+            {isPublicationsVariant
+              ? 'Rotate the 3D sphere and click any research topic orb or domain tab to filter the publications below in real time. Click Reset to view all papers.'
+              : `Spin the 3D sphere, lock onto any skill orb to trigger connected edge waves, or chain across neighboring nodes to explore all ${SKILL_NODES.length} core competencies.`}
           </p>
         </div>
 
@@ -1114,9 +1168,10 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
               <ul className="mt-3 divide-y divide-white/10">
                 {relatedPublications.map((pub) => (
                   <li key={pub.id} className="py-2 first:pt-0 last:pb-0">
-                    <button
-                      type="button"
-                      onClick={() => onSelectPublication?.(pub)}
+                    <a
+                      href={getPaperHref(pub)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="group/pub flex w-full items-start justify-between gap-2 rounded-lg py-0.5 text-left transition-colors hover:text-[#93C5FD] focus-visible:outline-2 focus-visible:outline-[#60A5FA]"
                     >
                       <span className="min-w-0">
@@ -1130,27 +1185,38 @@ export function SkillBubbleCloud({ onSelectTopic, onSelectPublication }) {
                             : ''}
                         </span>
                       </span>
-                      <ArrowRight
+                      <ExternalLink
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#60A5FA] opacity-60 transition-transform duration-150 group-hover/pub:translate-x-0.5 group-hover/pub:opacity-100"
                         aria-hidden="true"
                       />
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div className="mt-6 border-t border-white/10 pt-5">
+          <div className="mt-6 border-t border-white/10 pt-5 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() =>
-                onSelectTopic(
-                  activeSkill.publicationCategory,
-                  activeSkill.publicationSearchTerm
-                )
-              }
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#2563EB] px-5 py-2.5 text-center text-xs font-semibold text-white shadow-sm shadow-blue-950/50 transition-colors hover:bg-[#3B82F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
+              onClick={() => {
+                if (isPublicationsVariant && onLiveFilter) {
+                  onLiveFilter(
+                    activeSkill.publicationCategory,
+                    activeSkill.publicationSearchTerm,
+                    activeSkill.label
+                  );
+                  document
+                    .getElementById('publications-results')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                  onSelectTopic?.(
+                    activeSkill.publicationCategory,
+                    activeSkill.publicationSearchTerm
+                  );
+                }
+              }}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#2563EB] px-5 py-2.5 text-center text-xs font-semibold text-white shadow-sm shadow-blue-950/50 transition-colors hover:bg-[#3B82F6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#60A5FA]"
             >
               <span>Filter Publications for {activeSkill.shortLabel}</span>
               <ArrowRight className="h-3.5 w-3.5 shrink-0" />

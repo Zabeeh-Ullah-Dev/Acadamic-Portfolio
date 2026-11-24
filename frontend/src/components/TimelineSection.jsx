@@ -197,32 +197,27 @@ function TimelineColumn({
   );
 }
 
-export function TimelineSection({ mode = 'all' }) {
+export function TimelineSection({ mode = 'all' } = {}) {
   const portfolioData = usePortfolioData();
   const EXPERIENCE_TIMELINE = portfolioData?.experience || DEFAULT_EXPERIENCE;
   const EDUCATION_TIMELINE = portfolioData?.education || DEFAULT_EDUCATION;
 
+  const isLockedMode = mode === 'experience' || mode === 'education';
   const [sectionRef, revealed] = useScrollReveal({ threshold: 0.06 });
-  const [focusView, setFocusView] = useState(() => {
-    if (mode === 'experience' || mode === 'employment') return 'experience';
-    if (mode === 'education') return 'education';
-    return 'all';
-  });
+  const [focusView, setFocusView] = useState(isLockedMode ? mode : 'all');
   const [activeEntryId, setActiveEntryId] = useState(null);
 
-  // Sync tab selection with external hash navigation if mode is 'all'
   useEffect(() => {
-    if (mode !== 'all') {
-      if (mode === 'experience' || mode === 'employment') setFocusView('experience');
-      if (mode === 'education') setFocusView('education');
-      return;
+    if (isLockedMode) {
+      setFocusView(mode);
+      return undefined;
     }
 
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash === '#education') {
         setFocusView('education');
-      } else if (hash === '#experience' || hash === '#employment') {
+      } else if (hash === '#experience') {
         setFocusView('experience');
       } else if (hash === '#timeline') {
         setFocusView('all');
@@ -232,7 +227,9 @@ export function TimelineSection({ mode = 'all' }) {
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [mode]);
+  }, [isLockedMode, mode]);
+
+  const effectiveView = isLockedMode ? mode : focusView;
 
   const handleTabClick = (tabId) => {
     setFocusView(tabId);
@@ -245,14 +242,32 @@ export function TimelineSection({ mode = 'all' }) {
     }
   };
 
-  const isStrictExperience = mode === 'experience' || mode === 'employment' || focusView === 'experience';
-  const isStrictEducation = mode === 'education' || focusView === 'education';
+  const sectionCode =
+    effectiveView === 'experience'
+      ? '03A // EMPLOYMENT HISTORY'
+      : effectiveView === 'education'
+        ? '03B // ACADEMIC DEGREES'
+        : '03 // ACADEMIC TRAJECTORY';
+
+  const sectionTitle =
+    effectiveView === 'experience'
+      ? 'Employment & Research Experience'
+      : effectiveView === 'education'
+        ? 'Education & Academic Degrees'
+        : 'Education & Research Experience';
+
+  const sectionSubtitle =
+    effectiveView === 'experience'
+      ? 'Research fellowships, academic lectureship, and supervised graduate and undergraduate thesis mentorship.'
+      : effectiveView === 'education'
+        ? 'Formal academic training from foundational mathematics and computer science through doctoral research in Artificial Intelligence.'
+        : 'A connected progression from mathematical graph theory and computer science lectureship to international AI and NLP fellowships.';
 
   return (
     <section
-      id="timeline"
+      id={effectiveView === 'education' ? 'education-section' : effectiveView === 'experience' ? 'experience-section' : 'timeline'}
       ref={sectionRef}
-      className="section-defer relative overflow-hidden bg-[#0C0F14] py-16 sm:py-20"
+      className="section-defer relative overflow-hidden bg-[#0C0F14] py-20 sm:py-24"
     >
       <div
         aria-hidden="true"
@@ -267,29 +282,17 @@ export function TimelineSection({ mode = 'all' }) {
         >
           <div className="max-w-2xl">
             <p className="font-mono text-xs font-medium tracking-[0.04em] text-[#60A5FA]">
-              {mode === 'experience' || mode === 'employment'
-                ? '04 // EMPLOYMENT DETAILS'
-                : mode === 'education'
-                ? '05 // FORMAL EDUCATION'
-                : '03 // ACADEMIC TRAJECTORY'}
+              {sectionCode}
             </p>
             <h2 className="mt-2.5 text-3xl font-bold tracking-tight text-[#F3F5F8] sm:text-4xl">
-              {mode === 'experience' || mode === 'employment'
-                ? 'Employment Details & Research Roles'
-                : mode === 'education'
-                ? 'Education & Academic Pedigree'
-                : 'Education & Research Experience'}
+              {sectionTitle}
             </h2>
             <p className="mt-3 text-base leading-relaxed tracking-[0.01em] text-[#C4CCD6]">
-              {mode === 'experience' || mode === 'employment'
-                ? 'Academic faculty appointments, research fellowships, and university teaching trajectory across AI and Computer Science.'
-                : mode === 'education'
-                ? 'Doctoral AI studies at Universiti Brunei Darussalam alongside Master of Science and Bachelor of Science credentials.'
-                : 'A connected progression from mathematical graph theory and computer science lectureship to international AI and NLP fellowships.'}
+              {sectionSubtitle}
             </p>
           </div>
 
-          {mode === 'all' && (
+          {!isLockedMode && (
             <div
               role="tablist"
               aria-label="Filter trajectory view"
@@ -300,7 +303,7 @@ export function TimelineSection({ mode = 'all' }) {
                 { id: 'experience', label: 'Employment History' },
                 { id: 'education', label: 'Education' },
               ].map((tab) => {
-                const active = focusView === tab.id;
+                const active = effectiveView === tab.id;
                 return (
                   <button
                     key={tab.id}
@@ -324,16 +327,17 @@ export function TimelineSection({ mode = 'all' }) {
 
         <div
           className={`relative mt-12 grid grid-cols-1 gap-12 transition-all duration-300 ${
-            focusView === 'all' && mode === 'all'
+            effectiveView === 'all'
               ? 'lg:grid-cols-[1fr_auto_1fr] lg:gap-8 items-stretch'
-              : 'lg:grid-cols-1 max-w-4xl mx-auto'
+              : 'lg:grid-cols-1'
           }`}
         >
-          {((focusView === 'all' && mode === 'all') || isStrictExperience) && (
+          {(effectiveView === 'all' || effectiveView === 'experience') && (
             <div
               id="experience"
+              data-testid="employment-timeline"
               className={`scroll-mt-24 ${
-                focusView === 'experience' ? 'animate-panel-enter' : ''
+                effectiveView === 'experience' ? 'animate-panel-enter' : ''
               }`}
             >
               <TimelineColumn
@@ -347,25 +351,24 @@ export function TimelineSection({ mode = 'all' }) {
             </div>
           )}
 
-          {focusView === 'all' && mode === 'all' && (
+          {effectiveView === 'all' && (
             <>
-              {/* Subtle animated vertical gradient line for desktop (2050 design aesthetic) */}
               <div className="hidden lg:flex items-center justify-center self-stretch">
                 <SectionDivider variant="vertical" className="h-full py-6" />
               </div>
 
-              {/* Subtle animated horizontal gradient line for mobile/stacked view */}
               <div className="block lg:hidden my-2">
                 <SectionDivider />
               </div>
             </>
           )}
 
-          {((focusView === 'all' && mode === 'all') || isStrictEducation) && (
+          {(effectiveView === 'all' || effectiveView === 'education') && (
             <div
               id="education"
+              data-testid="education-timeline"
               className={`scroll-mt-24 ${
-                focusView === 'education' ? 'animate-panel-enter' : ''
+                effectiveView === 'education' ? 'animate-panel-enter' : ''
               }`}
             >
               <TimelineColumn

@@ -68,7 +68,7 @@ export const PUBLICATIONS = [
       'Integrates structural neighborhood cues alongside textual entity semantics.',
     ],
     keywords: ['Knowledge Graph Completion', 'BERT', 'Multi-Context', 'PAKDD'],
-    paperUrl: 'https://doi.org/10.1007/978-981-96-3636-5_3',
+    paperUrl: 'https://doi.org/10.1007/978-981-96-8298-0_1',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:R3hNpaxXUhUC',
     bibtex: `@inproceedings{gul2025mucokgc,
@@ -137,6 +137,7 @@ export const PUBLICATIONS = [
       'Includes reproducible benchmarking notebooks on GitHub (When-Metrics-Disagree).',
     ],
     keywords: ['Meta-Analysis', 'Benchmarking', 'MRR', 'Hits@K', 'Knowledge Graph Completion'],
+    paperUrl: 'https://arxiv.org/abs/2606.10287',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:35N4QoGY0k4C',
     githubUrl: 'https://github.com/hajigul/When-Metrics-Disagree',
@@ -159,7 +160,7 @@ export const PUBLICATIONS = [
     category: 'kg-llm',
     categoryLabel: 'Knowledge Graphs & LLMs',
     schematic: 'edas-radar',
-    figureUrl: '/assets/diagrams/pub-04.png',
+    figureUrl: '/assets/diagrams/pub-04.svg',
     figureCaption: 'Fig. 1. KG-EDAS distance-from-average-solution meta-metric pipeline (IEEE BigData 2025).',
     abstract:
       'Proposes KG-EDAS, an Evaluation Based on Distance from Average Solution (EDAS) meta-metric that synthesizes MRR, Hits@1/3/10, and computational efficiency into a single domain-consistent score.',
@@ -168,7 +169,7 @@ export const PUBLICATIONS = [
       'Supports weighted criteria tailored to latency-critical or recall-critical tasks.',
     ],
     keywords: ['KG-EDAS', 'Meta-Metric Benchmarking', 'IEEE BigData', 'Evaluation'],
-    paperUrl: 'https://doi.org/10.1109/BigData62323.2024.10825313',
+    paperUrl: 'https://doi.org/10.1109/BigData66926.2025.11402521',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:ns9cj8rnVeAC',
     githubUrl: 'https://github.com/hajigul/KG-EDAS-IEEE_BigData',
@@ -202,7 +203,7 @@ export const PUBLICATIONS = [
       'Bridges spectral graph theory and semantic relation diversity.',
     ],
     keywords: ['Spectral Graph Complexity', 'Link Prediction', 'Knowledge Graphs', 'IEEE BigData'],
-    paperUrl: 'https://doi.org/10.1109/BigData62323.2024.10825708',
+    paperUrl: 'https://doi.org/10.1109/BigData66926.2025.11401467',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:RGFaLdJalmkC',
     githubUrl:
@@ -236,6 +237,7 @@ export const PUBLICATIONS = [
       'Provides fast diagnostic complexity bounds without full training sweeps.',
     ],
     keywords: ['Cumulative Spectral Gradient', 'Spectral Graph Complexity', 'ICML'],
+    paperUrl: 'https://arxiv.org/abs/2509.02399',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:r0BpntZqJG4C',
     githubUrl:
@@ -269,6 +271,7 @@ export const PUBLICATIONS = [
       'Produces domain-calibrated evaluation profiles.',
     ],
     keywords: ['Meta-Metric Benchmarking', 'KG-EDAS', 'AAAI', 'Knowledge Graph Completion'],
+    paperUrl: 'https://doi.org/10.48448/0tm3-aa10',
     scholarUrl:
       'https://scholar.google.com/scholar?q=Domain-Aware+Evaluation+of+Knowledge+Graph+Completion+Models+Using+KG-EDAS+Haji+Gul',
     githubUrl: 'https://github.com/hajigul/Domain_Aware_KG_EDAS_GCLR_AAA',
@@ -300,6 +303,7 @@ export const PUBLICATIONS = [
       'Outperforms standard text-only triple classifiers on WN18RR and FB15k-237.',
     ],
     keywords: ['BERT', 'Knowledge Graph Completion', 'NeurIPS', 'Transformers'],
+    paperUrl: 'https://arxiv.org/abs/2412.11016',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:9ZlFYXVOiuMC',
     bibtex: `@inproceedings{gul2024contextualized,
@@ -330,6 +334,7 @@ export const PUBLICATIONS = [
       'Significantly improves Hits@1 on low-degree tail entities.',
     ],
     keywords: ['DualRep', 'Knowledge Graph Completion', 'Relational Paths', 'IEEE Access'],
+    paperUrl: 'https://doi.org/10.1109/ACCESS.2024.3501735',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:4TOpqqG69KYC',
     bibtex: `@article{gul2024dualrep,
@@ -361,6 +366,7 @@ export const PUBLICATIONS = [
       'Identifies open verification gaps in clinical decision support.',
     ],
     keywords: ['Explainable Healthcare AI', 'Interpretability', 'Systematic Review', 'Springer'],
+    paperUrl: 'https://doi.org/10.1007/s12553-025-01051-w',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:O3NaXMp0MMsC',
     bibtex: `@article{gul2026transparency,
@@ -392,6 +398,7 @@ export const PUBLICATIONS = [
       'Links cyber resilience with energy-sustainable industrial operations.',
     ],
     keywords: ['Industrial Control Systems', 'Cyber-Physical AI', 'Security', 'Survey'],
+    paperUrl: 'https://doi.org/10.1007/s10462-025-11320-9',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:TFP_iSt0sucC',
     bibtex: `@article{gul2025aisecureics,
@@ -423,6 +430,7 @@ export const PUBLICATIONS = [
       'Outlines open architectural challenges for autonomous transit grids.',
     ],
     keywords: ['Cyber-Physical Systems', 'Industry 4.0', 'Intelligent Transportation'],
+    paperUrl: 'https://doi.org/10.1016/j.dcan.2025.06.014',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:4JMBOYKVnBMC',
     bibtex: `@article{gul2025its,
@@ -454,6 +462,7 @@ export const PUBLICATIONS = [
       'Improves early-stage fake news detection before wide cascade spread.',
     ],
     keywords: ['Graph Neural Networks', 'Fake News Detection', 'Information Cascades'],
+    paperUrl: 'https://doi.org/10.1088/2632-072x/ad744d',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:KlAtU1dfN6UC',
     bibtex: `@article{gul2025fakenews,
@@ -486,7 +495,7 @@ export const PUBLICATIONS = [
       'Achieves superior AUC over classical Common Neighbors and Katz baselines.',
     ],
     keywords: ['Link Prediction', 'Local Paths', 'Complex Networks', 'Physica A'],
-    paperUrl: 'https://doi.org/10.1016/j.physa.2020.124980',
+    paperUrl: 'https://www.sciencedirect.com/science/article/pii/S0378437120305112',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:u-x6o8ySG0sC',
     bibtex: `@article{aziz2020localpaths,
@@ -521,7 +530,7 @@ export const PUBLICATIONS = [
       'Tested on Yeast PPI, C. elegans, E. coli, Karate, and Dolphins networks.',
     ],
     keywords: ['Link Prediction', 'Scientific Reports', 'Complex Networks', 'Local Similarity'],
-    paperUrl: 'https://doi.org/10.1038/s41598-020-77942-0',
+    paperUrl: 'https://doi.org/10.1038/s41598-020-76860-2',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:2osOgNQ5qMEC',
     githubUrl: 'https://github.com/hajigul/Link-Prediction-2021',
@@ -555,6 +564,7 @@ export const PUBLICATIONS = [
       'Provides runtime-accuracy trade-off curves for large sparse graphs.',
     ],
     keywords: ['Link Prediction', 'Systematic Analysis', 'Complex Networks', 'IEEE Access'],
+    paperUrl: 'https://doi.org/10.1109/ACCESS.2021.3053995',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:d1gkVwhDpl0C',
     bibtex: `@article{gul2021systematiclp,
@@ -586,6 +596,7 @@ export const PUBLICATIONS = [
       'Highlights resolution-limit caveats in hierarchical networks.',
     ],
     keywords: ['Community Detection', 'Modularity', 'Complex Networks'],
+    paperUrl: 'https://doi.org/10.1016/j.procs.2022.03.046',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:IjCSPb-OGe4C',
     bibtex: `@article{gul2022community,
@@ -617,6 +628,7 @@ export const PUBLICATIONS = [
       'Supports domain transfer for link prediction heuristics.',
     ],
     keywords: ['Structural Similarity', 'Complex Networks', 'Expert Systems', 'Wiley'],
+    paperUrl: 'https://doi.org/10.1111/exsy.13470',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:0EnyYjriUFMC',
     bibtex: `@article{gul2024analyzing,
@@ -648,6 +660,7 @@ export const PUBLICATIONS = [
       'Fast O(k^2) local computation compatible with streaming graphs.',
     ],
     keywords: ['Link Prediction', 'Double Degree', 'Complex Networks', 'WorldCIST'],
+    paperUrl: 'https://doi.org/10.1007/978-3-030-72654-6_32',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:9yKSN-GCB0IC',
     bibtex: `@inproceedings{gul2021doubledegree,
@@ -679,6 +692,7 @@ export const PUBLICATIONS = [
       'Balances global spanning-forest topology with local clustering.',
     ],
     keywords: ['Matrix-Forest Metric', 'Link Prediction', 'Oxford', 'Complex Networks'],
+    paperUrl: 'https://doi.org/10.1093/comnet/cnac039',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:YsMSGLbcyi4C',
     bibtex: `@article{gul2022matrixforest,
@@ -710,6 +724,7 @@ export const PUBLICATIONS = [
       'MATLAB optimization scripts & benchmark datasets available on GitHub.',
     ],
     keywords: ['Hill Climbing', 'Link Prediction', 'Undirected Graphs', 'MDPI'],
+    paperUrl: 'https://doi.org/10.3390/math10224265',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:WF5omc3nYNoC',
     githubUrl: 'https://github.com/hajigul/Efficient-LP-Method-Code',
@@ -742,6 +757,7 @@ export const PUBLICATIONS = [
       'Validated across sparse collaboration and citation graphs.',
     ],
     keywords: ['Shortest Path', 'Link Prediction', 'Structural Attributes'],
+    paperUrl: 'https://doi.org/10.3233/IDA-230030',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:LkGwnXOMwfcC',
     bibtex: `@article{gul2024shortestpath,
@@ -773,6 +789,7 @@ export const PUBLICATIONS = [
       'Bridges classical NLP pipelines with modern transformer embeddings.',
     ],
     keywords: ['NLP', 'RAG & Multimodal AI', 'Text Analysis', 'Business Intelligence'],
+    paperUrl: 'https://doi.org/10.4018/979-8-3693-5288-5.ch006',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:ULOm3_A8WrAC',
     bibtex: `@incollection{gul2024nlpbi,
@@ -804,6 +821,7 @@ export const PUBLICATIONS = [
       'Applicable to transit, infrastructure, and regional social graphs.',
     ],
     keywords: ['Laplace Characteristic', 'Spectral Graph Complexity', 'Link Prediction'],
+    paperUrl: 'https://doi.org/10.1016/j.procs.2023.09.048',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:Se3iqnhoufwC',
     bibtex: `@article{gul2023laplacegeo,
@@ -835,6 +853,7 @@ export const PUBLICATIONS = [
       'Improves recall on noisy experimental PPI measurements.',
     ],
     keywords: ['Protein Networks', 'Link Prediction', 'Bioinformatics', 'ICITS'],
+    paperUrl: 'https://doi.org/10.1007/978-981-16-7618-5_2',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:UeHWp8X0CEIC',
     bibtex: `@inproceedings{gul2022protein,
@@ -866,6 +885,7 @@ export const PUBLICATIONS = [
       'Evaluates cross-domain robustness of demographic profiling models.',
     ],
     keywords: ['NLP', 'Author Profiling', 'Machine Learning', 'ICITS'],
+    paperUrl: 'https://doi.org/10.1007/978-981-19-9331-2_11',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:qUcmZB5y_30C',
     bibtex: `@inproceedings{gul2023author,
@@ -897,6 +917,7 @@ export const PUBLICATIONS = [
       'Enables systematic clustering of complex network families.',
     ],
     keywords: ['Complex Networks', 'Feature Extraction', 'Structural Similarity', 'LNNS'],
+    paperUrl: 'https://doi.org/10.1007/978-3-031-45642-8_4',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:3fE2CSJIrl8C',
     bibtex: `@incollection{gul2024lnns,
@@ -928,6 +949,7 @@ export const PUBLICATIONS = [
       'Reduces cold-start errors on peripheral nodes.',
     ],
     keywords: ['Random Walk', 'Link Prediction', 'Human Networks', 'Topological Features'],
+    paperUrl: 'https://doi.org/10.3991/itdaf.v1i2.39675',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:roLk4NBRz8UC',
     bibtex: `@inproceedings{gul2023randomwalk,
@@ -958,6 +980,7 @@ export const PUBLICATIONS = [
       'Connects network medicine methods with clinical analytics.',
     ],
     keywords: ['Bioinformatics', 'Explainable Healthcare AI', 'Big Data', 'Springer'],
+    paperUrl: 'https://doi.org/10.1007/978-981-97-5734-3_4',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:QIV2ME_5wuYC',
     bibtex: `@incollection{gul2025bioinformatics,
@@ -989,6 +1012,7 @@ export const PUBLICATIONS = [
       'Proposes graph-aware anomaly detection directions.',
     ],
     keywords: ['Cyber Security', 'Cyber-Physical Systems', 'IGI Global'],
+    paperUrl: 'https://doi.org/10.4018/979-8-3693-6371-3.ch007',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:-f6ydRqryjwC',
     bibtex: `@incollection{gul2025cpssecurity,
@@ -1020,6 +1044,7 @@ export const PUBLICATIONS = [
       'Highlights responsible AI deployment policies.',
     ],
     keywords: ['Explainable Healthcare AI', 'Governance', 'Sustainable Health', 'CRC Press'],
+    paperUrl: 'https://doi.org/10.1201/9781003530879-21',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:YFjsv_pBGBYC',
     bibtex: `@incollection{gul2025governance,
@@ -1051,6 +1076,7 @@ export const PUBLICATIONS = [
       'Establishes baseline performance curves for sparse graphs.',
     ],
     keywords: ['Link Prediction', 'Complex Networks', 'Comparative Analysis'],
+    paperUrl: 'https://doi.org/10.4018/ijtd.2021070103',
     scholarUrl:
       'https://scholar.google.com/citations?view_op=view_citation&hl=en&user=WqmzWogAAAAJ&citation_for_view=WqmzWogAAAAJ:qjMakFHDy7sC',
     bibtex: `@article{gul2021ijtd,

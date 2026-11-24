@@ -4,22 +4,7 @@
  */
 
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  Award,
-  BookOpen,
-  Briefcase,
-  Code2,
-  GraduationCap,
-  Layers,
-  Mail,
-  Network,
-  ShieldCheck,
-  Sparkles,
-  Video,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { HeroSection } from './components/HeroSection';
 import { LoadingScreen } from './components/LoadingScreen';
 import { Navbar } from './components/Navbar';
@@ -51,21 +36,9 @@ const loadAcademicProfileSection = () =>
   import('./components/AcademicProfileSection').then((m) => ({
     default: m.AcademicProfileSection,
   }));
-const loadAcademicServiceSection = () =>
-  import('./components/AcademicServiceSection').then((m) => ({
-    default: m.AcademicServiceSection,
-  }));
-const loadCertificationsSection = () =>
-  import('./components/CertificationsSection').then((m) => ({
-    default: m.CertificationsSection,
-  }));
-const loadHonorsSection = () =>
-  import('./components/HonorsSection').then((m) => ({
-    default: m.HonorsSection,
-  }));
-const loadLecturesSection = () =>
-  import('./components/LecturesSection').then((m) => ({
-    default: m.LecturesSection,
+const loadHonorsAndLecturesSection = () =>
+  import('./components/HonorsAndLecturesSection').then((m) => ({
+    default: m.HonorsAndLecturesSection,
   }));
 const loadContactSection = () =>
   import('./components/ContactSection').then((m) => ({
@@ -87,10 +60,7 @@ const PublicationsSection = lazy(loadPublicationsSection);
 const OpenSourceSection = lazy(loadOpenSourceSection);
 const TimelineSection = lazy(loadTimelineSection);
 const AcademicProfileSection = lazy(loadAcademicProfileSection);
-const AcademicServiceSection = lazy(loadAcademicServiceSection);
-const CertificationsSection = lazy(loadCertificationsSection);
-const HonorsSection = lazy(loadHonorsSection);
-const LecturesSection = lazy(loadLecturesSection);
+const HonorsAndLecturesSection = lazy(loadHonorsAndLecturesSection);
 const ContactSection = lazy(loadContactSection);
 const Footer = lazy(loadFooter);
 const PublicationModal = lazy(loadPublicationModal);
@@ -100,19 +70,14 @@ const HASH_TO_SECTION_KEY = {
   research: 'research',
   publications: 'publications',
   projects: 'projects',
-  code: 'projects',
   experience: 'experience',
-  employment: 'experience',
-  education: 'education',
+  education: 'experience',
   'academic-profile': 'academic-profile',
-  profile: 'academic-profile',
   skills: 'academic-profile',
   teaching: 'academic-profile',
-  service: 'service',
-  'academic-service': 'service',
-  certifications: 'certifications',
+  service: 'academic-profile',
   honors: 'honors',
-  lectures: 'lectures',
+  lectures: 'honors',
   contact: 'contact',
 };
 
@@ -122,10 +87,7 @@ const SECTION_LOADERS = {
   projects: loadOpenSourceSection,
   experience: loadTimelineSection,
   'academic-profile': loadAcademicProfileSection,
-  service: loadAcademicServiceSection,
-  certifications: loadCertificationsSection,
-  honors: loadHonorsSection,
-  lectures: loadLecturesSection,
+  honors: loadHonorsAndLecturesSection,
   contact: loadContactSection,
   footer: loadFooter,
 };
@@ -224,14 +186,14 @@ const PAGE_TITLES = {
   employment: '04 // Employment Details',
   timeline: '04 // Employment Details',
   education: '05 // Education & Degrees',
-  'academic-profile': '06 // Academic Profile & Teaching',
-  profile: '06 // Academic Profile & Teaching',
-  service: '07 // Academic Service & Reviewer Board',
-  'academic-service': '07 // Academic Service & Reviewer Board',
-  certifications: '08 // Technical Certifications',
-  honors: '09 // Honors & Awards',
-  lectures: '10 // YouTube Video Lectures',
-  contact: '11 // Contact & References',
+  'academic-profile': '06 // Profile · Teaching & Technical Skills',
+  profile: '06 // Profile · Teaching & Technical Skills',
+  'academic-service': '07 // Academic Service & Reviewing',
+  service: '07 // Academic Service & Reviewing',
+  certifications: '08 // Verified Certifications',
+  honors: '08 // Honors & Awards',
+  lectures: '09 // YouTube Video Lectures',
+  contact: '10 // Contact & References',
 };
 
 export default function App() {
@@ -246,6 +208,7 @@ export default function App() {
   const [sortMode, setSortMode] = useState('year-desc');
   const [onlyWithCode, setOnlyWithCode] = useState(false);
   const [focusedPublicationId, setFocusedPublicationId] = useState(null);
+  const [activeSphereLabel, setActiveSphereLabel] = useState('');
   const [selectedPublication, setSelectedPublication] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -296,10 +259,19 @@ export default function App() {
 
   const handleSelectTopic = (nextCategory, nextQuery = '') => {
     setFocusedPublicationId(null);
+    setActiveSphereLabel('');
     setCategory(nextCategory);
     setSearchQuery(nextQuery);
     setOnlyWithCode(false);
     navigateToRoute('publications');
+  };
+
+  const handleApplySphereFilter = (nextCategory, nextQuery = '', label = '') => {
+    setFocusedPublicationId(null);
+    setCategory(nextCategory || 'all');
+    setSearchQuery(nextQuery || '');
+    setOnlyWithCode(false);
+    setActiveSphereLabel(label || '');
   };
 
   const handleExplorePaper = (publicationId) => {
@@ -307,17 +279,20 @@ export default function App() {
     setCategory('all');
     setSearchQuery('');
     setOnlyWithCode(false);
+    setActiveSphereLabel('');
     setFocusedPublicationId(publicationId);
     navigateToRoute('publications');
   };
 
   const handleCategoryChange = (nextCategory) => {
     setFocusedPublicationId(null);
+    setActiveSphereLabel('');
     setCategory(nextCategory);
   };
 
   const handleSearchChange = (nextQuery) => {
     setFocusedPublicationId(null);
+    setActiveSphereLabel('');
     setSearchQuery(nextQuery);
   };
 
@@ -328,6 +303,7 @@ export default function App() {
 
   const handleResetFilters = () => {
     setFocusedPublicationId(null);
+    setActiveSphereLabel('');
     setCategory('all');
     setSearchQuery('');
     setSortMode('year-desc');
@@ -381,7 +357,7 @@ export default function App() {
                 Loading section...
               </div>
             }>
-              {/* HOME / OVERVIEW ROUTE */}
+              {/* HOME / OVERVIEW ROUTE: Hero + 6 Projects + Honors + Contact & References */}
               {currentRoute === '' && (
                 <>
                   <HeroSection
@@ -390,145 +366,17 @@ export default function App() {
                     metricsReady={heroReady}
                   />
 
-                  {/* Curated Interactive Directory Cards */}
-                  <section className="relative overflow-hidden py-16 sm:py-20 bg-[#0A0E17]/95 border-t border-white/10">
-                    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                      <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                        <div>
-                          <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#60A5FA]">
-                            RESEARCH PORTFOLIO DIRECTORY
-                          </p>
-                          <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                            Explore Dedicated Sections
-                          </h2>
-                          <p className="mt-2 text-sm text-[#94A3B8]">
-                            Select any dedicated section below or use the top navigation bar to open its page.
-                          </p>
-                        </div>
-                      </div>
+                  <SectionDivider />
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {[
-                          {
-                            id: 'research',
-                            title: 'Research Pillars',
-                            desc: 'Knowledge graph completion, spectral complex networks, transformers & LLM alignment.',
-                            icon: Network,
-                            color: 'text-cyan-400 border-cyan-500/30 group-hover:border-cyan-400/60',
-                            badge: '3 Pillars',
-                          },
-                          {
-                            id: 'publications',
-                            title: 'Publications Catalog',
-                            desc: '32 peer-reviewed scientific articles, conference proceedings, preprints & bibtex.',
-                            icon: BookOpen,
-                            color: 'text-blue-400 border-blue-500/30 group-hover:border-blue-400/60',
-                            badge: '32 Papers',
-                          },
-                          {
-                            id: 'projects',
-                            title: 'Open Source & Code',
-                            desc: 'PyTorch / TF benchmark repositories, knowledge graph embeddings & algorithmic code.',
-                            icon: Code2,
-                            color: 'text-emerald-400 border-emerald-500/30 group-hover:border-emerald-400/60',
-                            badge: 'Repositories',
-                          },
-                          {
-                            id: 'experience',
-                            title: 'Employment Details',
-                            desc: 'DAAD AInet NLP fellowship, university CS faculty appointments & research roles.',
-                            icon: Briefcase,
-                            color: 'text-violet-400 border-violet-500/30 group-hover:border-violet-400/60',
-                            badge: 'Timeline',
-                          },
-                          {
-                            id: 'education',
-                            title: 'Education & Degrees',
-                            desc: 'PhD in Artificial Intelligence at UBD, MS & BS in Computer Science.',
-                            icon: GraduationCap,
-                            color: 'text-indigo-400 border-indigo-500/30 group-hover:border-indigo-400/60',
-                            badge: 'Degrees',
-                          },
-                          {
-                            id: 'academic-profile',
-                            title: 'Academic Profile & Skills',
-                            desc: 'Subjects taught, course progression graph, and technical engineering stack.',
-                            icon: Layers,
-                            color: 'text-sky-400 border-sky-500/30 group-hover:border-sky-400/60',
-                            badge: 'Pedagogy',
-                          },
-                          {
-                            id: 'service',
-                            title: 'Academic Service',
-                            desc: 'Peer-review service across IEEE, ACM, Springer journals & conference technical program committees.',
-                            icon: ShieldCheck,
-                            color: 'text-emerald-400 border-emerald-500/30 group-hover:border-emerald-400/60',
-                            badge: 'Peer Review',
-                          },
-                          {
-                            id: 'certifications',
-                            title: 'Technical Certifications',
-                            desc: 'Verified DeepLearning.AI, IBM, and Google Cloud credentials with certificate previews.',
-                            icon: Award,
-                            color: 'text-amber-400 border-amber-500/30 group-hover:border-amber-400/60',
-                            badge: 'Credentials',
-                          },
-                          {
-                            id: 'lectures',
-                            title: 'Video Lectures',
-                            desc: '219+ university-level lectures on YouTube across Graph Theory & ML computing.',
-                            icon: Video,
-                            color: 'text-rose-400 border-rose-500/30 group-hover:border-rose-400/60',
-                            badge: 'YouTube',
-                          },
-                        ].map((card) => {
-                          const CardIcon = card.icon;
-                          return (
-                            <button
-                              key={card.id}
-                              type="button"
-                              onClick={() => navigateToRoute(card.id)}
-                              className={`group relative text-left p-6 rounded-2xl bg-[#0D121D]/80 border transition-all duration-200 hover:-translate-y-1 hover:bg-[#121927] hover:shadow-xl hover:shadow-cyan-500/10 cursor-pointer flex flex-col justify-between ${card.color}`}
-                            >
-                              <div>
-                                <div className="flex items-center justify-between mb-4">
-                                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                                    <CardIcon className="w-5 h-5" />
-                                  </div>
-                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/10 text-slate-300">
-                                    {card.badge}
-                                  </span>
-                                </div>
-                                <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
-                                  {card.title}
-                                </h3>
-                                <p className="mt-2 text-xs leading-relaxed text-[#94A3B8]">
-                                  {card.desc}
-                                </p>
-                              </div>
-                              <div className="mt-5 flex items-center gap-1.5 text-xs font-mono text-cyan-400 group-hover:underline">
-                                <span>Open Section Page</span>
-                                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </section>
+                  <OpenSourceSection variant="home" initialLimit={6} showAllByDefault={false} />
 
-                  {/* Home Page Featured Sections: Projects (6 projects), Honors, Contact & References */}
-                  <div className="border-t border-white/10">
-                    <OpenSourceSection isHomePage={true} onNavigate={navigateToRoute} />
-                  </div>
+                  <SectionDivider />
 
-                  <div className="border-t border-white/10">
-                    <HonorsSection />
-                  </div>
+                  <HonorsAndLecturesSection mode="honors-only" />
 
-                  <div className="border-t border-white/10">
-                    <ContactSection />
-                  </div>
+                  <SectionDivider />
+
+                  <ContactSection />
                 </>
               )}
 
@@ -544,81 +392,83 @@ export default function App() {
 
               {/* DEDICATED PUBLICATIONS PAGE */}
               {currentRoute === 'publications' && (
-                <div className="py-6 sm:py-10">
+                <div className="py-4 sm:py-6">
                   <PublicationsSection
                     category={category}
                     searchQuery={searchQuery}
                     sortMode={sortMode}
                     onlyWithCode={onlyWithCode}
                     focusedPublicationId={focusedPublicationId}
+                    activeSphereLabel={activeSphereLabel}
                     onCategoryChange={handleCategoryChange}
                     onSearchChange={handleSearchChange}
                     onSortChange={setSortMode}
                     onToggleOnlyWithCode={handleToggleOnlyWithCode}
                     onClearFocusedPublication={() => setFocusedPublicationId(null)}
+                    onApplySphereFilter={handleApplySphereFilter}
                     onResetFilters={handleResetFilters}
                     onSelectPublication={setSelectedPublication}
                   />
                 </div>
               )}
 
-              {/* DEDICATED OPEN SOURCE & CODE PAGE (ALL PROJECTS) */}
+              {/* DEDICATED CODE PAGE (All Open-Source Projects) */}
               {(currentRoute === 'projects' || currentRoute === 'code') && (
                 <div className="py-6 sm:py-10">
-                  <OpenSourceSection isHomePage={false} onNavigate={navigateToRoute} />
+                  <OpenSourceSection variant="page" showAllByDefault={true} />
                 </div>
               )}
 
-              {/* DEDICATED EMPLOYMENT DETAILS PAGE (ONLY EMPLOYMENT) */}
+              {/* DEDICATED EMPLOYMENT DETAILS PAGE (Employment ONLY) */}
               {(currentRoute === 'experience' || currentRoute === 'employment' || currentRoute === 'timeline') && (
                 <div className="py-6 sm:py-10">
                   <TimelineSection mode="experience" />
                 </div>
               )}
 
-              {/* DEDICATED EDUCATION PAGE (ONLY EDUCATION) */}
+              {/* DEDICATED EDUCATION PAGE (Education ONLY) */}
               {currentRoute === 'education' && (
                 <div className="py-6 sm:py-10">
                   <TimelineSection mode="education" />
                 </div>
               )}
 
-              {/* DEDICATED ACADEMIC PROFILE & TEACHING PAGE */}
+              {/* DEDICATED PROFILE PAGE (Subjects Taught & Technical Skills ONLY) */}
               {(currentRoute === 'academic-profile' || currentRoute === 'profile') && (
                 <div className="py-6 sm:py-10">
-                  <AcademicProfileSection />
+                  <AcademicProfileSection mode="profile" />
                 </div>
               )}
 
-              {/* DEDICATED ACADEMIC SERVICE PAGE */}
-              {(currentRoute === 'service' || currentRoute === 'academic-service') && (
+              {/* DEDICATED ACADEMIC SERVICE PAGE (Academic Service ONLY) */}
+              {(currentRoute === 'academic-service' || currentRoute === 'service') && (
                 <div className="py-6 sm:py-10">
-                  <AcademicServiceSection />
+                  <AcademicProfileSection mode="service" />
                 </div>
               )}
 
-              {/* DEDICATED TECHNICAL CERTIFICATIONS PAGE */}
+              {/* DEDICATED CERTIFICATIONS PAGE */}
               {currentRoute === 'certifications' && (
-                <div className="py-6 sm:py-10">
-                  <CertificationsSection />
+                <div className="py-4 sm:py-6">
+                  <HonorsAndLecturesSection mode="certifications" />
                 </div>
               )}
 
-              {/* DEDICATED HONORS & AWARDS PAGE */}
+              {/* DEDICATED HONORS & AWARDS PAGE (Direct URL fallback) */}
               {currentRoute === 'honors' && (
-                <div className="py-6 sm:py-10">
-                  <HonorsSection />
+                <div className="py-4 sm:py-6">
+                  <HonorsAndLecturesSection mode="honors-only" />
                 </div>
               )}
 
-              {/* DEDICATED VIDEO LECTURES PAGE */}
+              {/* DEDICATED VIDEO LECTURES PAGE (Single Focused Page) */}
               {currentRoute === 'lectures' && (
-                <div className="py-6 sm:py-10">
-                  <LecturesSection />
+                <div className="py-4 sm:py-6">
+                  <HonorsAndLecturesSection mode="lectures" />
                 </div>
               )}
 
-              {/* DEDICATED CONTACT PAGE */}
+              {/* DEDICATED CONTACT PAGE (Direct URL fallback) */}
               {currentRoute === 'contact' && (
                 <div className="py-6 sm:py-10">
                   <ContactSection />

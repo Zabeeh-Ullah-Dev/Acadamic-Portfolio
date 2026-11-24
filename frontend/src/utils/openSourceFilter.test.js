@@ -26,11 +26,22 @@ test('default open-source view returns only 2 featured repositories while search
     ['oss-researchdesk', 'oss-cardiorisk']
   );
 
+  const visibleSix = getVisibleOpenSourceProjects(OPEN_SOURCE_PROJECTS, {
+    category: 'all',
+    searchQuery: '',
+    showAll: false,
+    initialLimit: 6,
+  });
+  assert.equal(visibleSix.length, 6);
+  assert.equal(visibleSix[0].id, 'oss-researchdesk');
+  assert.equal(visibleSix[1].id, 'oss-cardiorisk');
+  assert.equal(new Set(visibleSix.map((p) => p.id)).size, 6);
+
   const visibleExpanded = getVisibleOpenSourceProjects(OPEN_SOURCE_PROJECTS, {
     category: 'all',
     searchQuery: '',
     showAll: true,
-    initialLimit: 2,
+    initialLimit: 6,
   });
   assert.equal(visibleExpanded.length, OPEN_SOURCE_PROJECTS.length);
 

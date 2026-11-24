@@ -15,11 +15,14 @@ import {
   YOUTUBE_LECTURES,
 } from '../data/portfolioData.js';
 import {
+  FEATURED_DIAGRAM_PUBLICATION_IDS,
   filterAndSortPublications,
   getCategoryCounts,
   getCodeBackedCount,
+  getPaperHref,
   getVisiblePublications,
   isPublicationFilterActive,
+  partitionPublications,
 } from './publicationsFilter.js';
 import { SPLASH_HIGHLIGHTS } from './splashScreen.js';
 import { SEO_CONFIG } from './seoMeta.js';
@@ -34,6 +37,7 @@ test('inventory contains all 32 publications with unique ids, valid BibTeX, publ
     assert.ok(pub.title && pub.title.length > 5, `Missing title for ${pub.id}`);
     assert.ok(pub.abstract && pub.abstract.length > 20, `Missing idea/abstract for ${pub.id}`);
     assert.ok(pub.publisher && pub.publisher.length > 1, `Missing publisher for ${pub.id}`);
+    assert.ok(pub.paperUrl?.startsWith('https://'), `Missing official paperUrl for ${pub.id}`);
     assert.ok(pub.scholarUrl?.startsWith('https://scholar.google.com/'), `Missing scholarUrl for ${pub.id}`);
     if (
       pub.scholarUrl.startsWith(
@@ -57,6 +61,8 @@ test('inventory contains all 32 publications with unique ids, valid BibTeX, publ
   }
 
   assert.equal(exactCitationCount, 31, 'Expected 31/32 exact view_citation Google Scholar URLs');
+  const pub02 = PUBLICATIONS.find((p) => p.id === 'pub-02');
+  assert.equal(getPaperHref(pub02), 'https://aclanthology.org/2025.bionlp-1.27/');
   const pub11 = PUBLICATIONS.find((p) => p.id === 'pub-11');
   assert.equal(
     pub11?.scholarUrl,
@@ -64,7 +70,16 @@ test('inventory contains all 32 publications with unique ids, valid BibTeX, publ
   );
 });
 
-test('default publications view shows only the 2 most recent papers, while search or any filter shows all matching papers', () => {
+test('partitionPublications places the exact 6 curated diagram papers first and puts all remaining 26 papers in one-line list', () => {
+  assert.deepEqual(FEATURED_DIAGRAM_PUBLICATION_IDS, [
+    'pub-02',
+    'pub-01',
+    'pub-14',
+    'pub-15',
+    'pub-04',
+    'pub-05',
+  ]);
+
   const defaultSorted = filterAndSortPublications(PUBLICATIONS, {
     category: 'all',
     searchQuery: '',
@@ -72,13 +87,17 @@ test('default publications view shows only the 2 most recent papers, while searc
     onlyWithCode: false,
   });
   assert.equal(isPublicationFilterActive({ category: 'all', searchQuery: '', onlyWithCode: false }), false);
-  const defaultVisible = getVisiblePublications(defaultSorted, {
-    category: 'all',
-    searchQuery: '',
-    onlyWithCode: false,
+
+  const { featuredWithDiagrams, compactOneLine } = partitionPublications(defaultSorted, {
+    preserveFeaturedOrder: true,
   });
-  assert.equal(defaultVisible.length, 2);
-  assert.ok(defaultVisible.every((p) => p.year === 2026));
+
+  assert.equal(featuredWithDiagrams.length, 6);
+  assert.equal(compactOneLine.length, 26);
+  assert.deepEqual(
+    featuredWithDiagrams.map((p) => p.id),
+    ['pub-02', 'pub-01', 'pub-14', 'pub-15', 'pub-04', 'pub-05']
+  );
 
   const kgFiltered = filterAndSortPublications(PUBLICATIONS, {
     category: 'kg-llm',

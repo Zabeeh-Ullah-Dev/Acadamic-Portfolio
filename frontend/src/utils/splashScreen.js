@@ -64,7 +64,7 @@ export const PRIMARY_NAV_ITEMS = [
   { label: 'Employment', href: '#/experience', id: 'experience' },
   { label: 'Education', href: '#/education', id: 'education' },
   { label: 'Profile', href: '#/academic-profile', id: 'academic-profile' },
-  { label: 'Academic Service', href: '#/service', id: 'service' },
+  { label: 'Academic Service', href: '#/academic-service', id: 'academic-service' },
   { label: 'Certifications', href: '#/certifications', id: 'certifications' },
   { label: 'Lectures', href: '#/lectures', id: 'lectures' },
 ];
@@ -77,19 +77,25 @@ export function mapSectionIdToNavId(sectionId) {
     case 'publications':
       return 'publications';
     case 'projects':
+    case 'code':
       return 'projects';
     case 'experience':
+    case 'employment':
     case 'timeline':
       return 'experience';
     case 'education':
       return 'education';
     case 'academic-profile':
+    case 'profile':
     case 'subjects-taught':
-    case 'academic-service':
     case 'technical-skills':
       return 'academic-profile';
-    case 'honors':
+    case 'academic-service':
+    case 'service':
+      return 'academic-service';
     case 'certifications':
+      return 'certifications';
+    case 'honors':
       return 'honors';
     case 'lectures':
       return 'lectures';

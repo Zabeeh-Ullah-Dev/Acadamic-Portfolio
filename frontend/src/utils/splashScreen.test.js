@@ -41,7 +41,7 @@ test('computeSplashProgress clamps cleanly from 0 to 100 over 2500ms with smooth
   assert.match(getSplashStatusLabel(96), /entering research portfolio/i);
 });
 
-test('PRIMARY_NAV_ITEMS includes all 9 restored portfolio navigation links and maps sections directly', () => {
+test('PRIMARY_NAV_ITEMS excludes Contact & Honors and includes Academic Service & Certifications', () => {
   assert.equal(PRIMARY_NAV_ITEMS.length, 9);
   assert.deepEqual(
     PRIMARY_NAV_ITEMS.map((item) => item.label),
@@ -49,23 +49,28 @@ test('PRIMARY_NAV_ITEMS includes all 9 restored portfolio navigation links and m
       'Research',
       'Publications',
       'Code',
-      'Experience',
+      'Employment',
       'Education',
-      'Teaching',
-      'Honors',
+      'Profile',
+      'Academic Service',
+      'Certifications',
       'Lectures',
-      'Contact',
     ]
   );
+  assert.equal(PRIMARY_NAV_ITEMS.some((i) => i.id === 'contact'), false);
+  assert.equal(PRIMARY_NAV_ITEMS.some((i) => i.id === 'honors'), false);
   assert.equal(mapSectionIdToNavId('research'), 'research');
   assert.equal(mapSectionIdToNavId('publications'), 'publications');
   assert.equal(mapSectionIdToNavId('projects'), 'projects');
+  assert.equal(mapSectionIdToNavId('code'), 'projects');
   assert.equal(mapSectionIdToNavId('experience'), 'experience');
+  assert.equal(mapSectionIdToNavId('employment'), 'experience');
   assert.equal(mapSectionIdToNavId('education'), 'education');
   assert.equal(mapSectionIdToNavId('academic-profile'), 'academic-profile');
   assert.equal(mapSectionIdToNavId('technical-skills'), 'academic-profile');
-  assert.equal(mapSectionIdToNavId('honors'), 'honors');
+  assert.equal(mapSectionIdToNavId('academic-service'), 'academic-service');
+  assert.equal(mapSectionIdToNavId('service'), 'academic-service');
+  assert.equal(mapSectionIdToNavId('certifications'), 'certifications');
   assert.equal(mapSectionIdToNavId('lectures'), 'lectures');
-  assert.equal(mapSectionIdToNavId('contact'), 'contact');
   assert.equal(mapSectionIdToNavId('unknown'), '');
 });

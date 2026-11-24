@@ -180,6 +180,17 @@ export function PublicationModal({ publication, onClose }) {
               : (Array.isArray(publication.highlights) ? publication.highlights.join(' · ') : '')}
           </span>
           <div className="flex flex-wrap items-center gap-4">
+            {publication.paperUrl && (
+              <a
+                href={publication.paperUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#2563EB] px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#3B82F6]"
+              >
+                <span>Open Paper Website</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
             {publication.githubUrl && (
               <a
                 href={publication.githubUrl}

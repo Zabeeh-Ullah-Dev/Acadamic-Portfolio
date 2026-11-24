@@ -113,7 +113,7 @@ export function ContactSection() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <p className="font-mono text-xs font-medium text-[#60A5FA]">
-              06. Correspondence & Verification
+              06. Correspondence &amp; References
             </p>
             <h2 className="mt-2.5 text-3xl font-bold tracking-tight text-[#F3F5F8] sm:text-4xl">
               Contact &amp; References
@@ -733,7 +733,7 @@ export function ContactSection() {
           </div>
 
           {/* References (Clean 3-Column Editorial Band) */}
-          <div className="mt-14 border-t border-white/10 pt-10">
+          <div id="references" className="mt-14 border-t border-white/10 pt-10">
             <h3 className="text-lg font-semibold text-[#F3F5F8]">
               References
             </h3>

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { TECHNICAL_SKILLS_STACK } from '../data/portfolioData';
 import { ResearchBentoCard } from './ResearchBentoCard';
+import { ServiceReviewerBoard } from './ServiceReviewerBoard';
 import { SkillMatrix } from './SkillMatrix';
 import { TeachingSkillTree } from './TeachingSkillTree';
 import {
@@ -113,7 +114,10 @@ const PRESET_BENTO_SPANS = {
   'preset-spectral': 'sm:col-span-7',
 };
 
-export function AcademicProfileSection() {
+export function AcademicProfileSection({ mode = 'profile' } = {}) {
+  const showProfileParts = mode === 'profile' || mode === 'all';
+  const showServicePart = mode === 'service' || mode === 'all';
+
   const [skillCategoryFilter, setSkillCategoryFilter] = useState('all');
   const [skillQuery, setSkillQuery] = useState('');
   const [activePresetId, setActivePresetId] = useState(null);
@@ -210,7 +214,7 @@ export function AcademicProfileSection() {
 
   return (
     <section
-      id="academic-profile"
+      id={mode === 'service' ? 'academic-service-page' : 'academic-profile'}
       className="section-defer relative overflow-hidden bg-[#10141B] py-20 sm:py-24"
     >
       <div
@@ -219,10 +223,14 @@ export function AcademicProfileSection() {
       />
 
       <div className="relative z-10 mx-auto max-w-6xl space-y-24 px-4 sm:px-6 lg:px-8">
-        {/* Part 1: Subjects Taught & Course Progression */}
-        <TeachingSkillTree />
+        {/* Part 1: Subjects Taught & Course Progression (Profile Page) */}
+        {showProfileParts && <TeachingSkillTree />}
 
-        {/* Part 2: Technical Skills & Core Stack */}
+        {/* Part 2: Academic Service & Reviewer Board (Dedicated Academic Service Page) */}
+        {showServicePart && <ServiceReviewerBoard />}
+
+        {/* Part 3: Technical Skills & Core Stack (Profile Page) */}
+        {showProfileParts && (
         <section
           id="technical-skills"
           aria-labelledby="technical-skills-heading"
@@ -426,6 +434,7 @@ export function AcademicProfileSection() {
             onResetFilters={handleResetFilters}
           />
         </section>
+        )}
       </div>
     </section>
   );

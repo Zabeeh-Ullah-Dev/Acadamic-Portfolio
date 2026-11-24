@@ -17,11 +17,9 @@ const FOOTER_QUICK_LINKS = [
   { label: 'Employment', href: '#/experience', id: 'experience' },
   { label: 'Education', href: '#/education', id: 'education' },
   { label: 'Profile', href: '#/academic-profile', id: 'academic-profile' },
-  { label: 'Service', href: '#/service', id: 'service' },
+  { label: 'Service', href: '#/academic-service', id: 'academic-service' },
   { label: 'Certifications', href: '#/certifications', id: 'certifications' },
-  { label: 'Honors', href: '#/honors', id: 'honors' },
   { label: 'Lectures', href: '#/lectures', id: 'lectures' },
-  { label: 'Contact', href: '#/contact', id: 'contact' },
 ];
 
 const FOOTER_SOCIALS = [

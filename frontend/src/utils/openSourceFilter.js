@@ -61,5 +61,7 @@ export function getVisibleOpenSourceProjects(
     return featured.slice(0, initialLimit);
   }
 
-  return filteredProjects.slice(0, initialLimit);
+  const featuredIds = new Set(featured.map((project) => project.id));
+  const remaining = filteredProjects.filter((project) => !featuredIds.has(project.id));
+  return [...featured, ...remaining].slice(0, initialLimit);
 }
