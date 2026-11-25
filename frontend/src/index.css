@@ -220,6 +220,15 @@ h1, h2, h3, h4 {
   }
 }
 
+@keyframes nodeFloatAlt {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
 .animate-panel-enter {
   animation: panelEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -336,6 +345,10 @@ h1, h2, h3, h4 {
 
 .animate-orbital-float {
   animation: orbitalFloat 6.5s ease-in-out infinite;
+}
+
+.animate-node-float-alt {
+  animation: nodeFloatAlt 7.2s ease-in-out infinite;
 }
 
 /* 2050 Futuristic Animated Gradient Line Keyframes & Utilities */
