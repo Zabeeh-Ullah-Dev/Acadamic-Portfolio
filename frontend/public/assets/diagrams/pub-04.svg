@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-label="KG-EDAS Meta-Metric Pipeline Diagram">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#E2E8F0" stroke-width="0.7" opacity="0.55" />
+    </pattern>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB" />
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#059669" />
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#DC2626" />
+    </marker>
+  </defs>
+
+  <!-- Outer Card -->
+  <rect x="16" y="16" width="928" height="508" rx="16" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" />
+  <rect x="17" y="64" width="926" height="459" rx="15" fill="url(#grid)" />
+
+  <!-- Top Header Banner -->
+  <path d="M 16 32 Q 16 16 32 16 L 928 16 Q 944 16 944 32 L 944 64 L 16 64 Z" fill="#0B1220" />
+  <text x="38" y="45" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14" font-weight="700" fill="#93C5FD" letter-spacing="0.6">
+    FIG. 1 // KG-EDAS META-METRIC PIPELINE
+  </text>
+  <text x="922" y="45" text-anchor="end" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" font-weight="500" fill="#CBD5E1">
+    IEEE BigData 2025 · IEEE
+  </text>
+
+  <!-- Stage 1: Input Criteria Matrix -->
+  <rect x="40" y="106" width="196" height="316" rx="14" fill="#FFFFFF" stroke="#475569" stroke-width="2" />
+  <text x="138" y="138" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="14" font-weight="700" fill="#0F172A">
+    Input Criteria Matrix
+  </text>
+  <line x1="60" y1="150" x2="216" y2="150" stroke="#E2E8F0" stroke-width="1" />
+
+  <rect x="58" y="166" width="160" height="36" rx="8" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1" />
+  <text x="138" y="189" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" font-weight="600" fill="#1E3A8A">
+    MRR (w₁)
+  </text>
+
+  <rect x="58" y="214" width="160" height="36" rx="8" fill="#DBEAFE" stroke="#93C5FD" stroke-width="1" />
+  <text x="138" y="237" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" font-weight="600" fill="#1E3A8A">
+    Hits@1,3,10 (w₂)
+  </text>
+
+  <rect x="58" y="262" width="160" height="36" rx="8" fill="#CCFBF1" stroke="#5EEAD4" stroke-width="1" />
+  <text x="138" y="285" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" font-weight="600" fill="#115E59">
+    Runtime / Cost (w₃)
+  </text>
+
+  <rect x="58" y="310" width="160" height="36" rx="8" fill="#FEF3C7" stroke="#FCD34D" stroke-width="1" />
+  <text x="138" y="333" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" font-weight="600" fill="#92400E">
+    Memory / Scale (w₄)
+  </text>
+
+  <text x="138" y="384" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12" fill="#475569">
+    Domain Weights wⱼ
+  </text>
+
+  <!-- Arrow 1 -> 2 -->
+  <line x1="236" y1="264" x2="274" y2="264" stroke="#2563EB" stroke-width="2.4" marker-end="url(#arrow-blue)" />
+
+  <!-- Stage 2: Average Solution -->
+  <rect x="282" y="176" width="184" height="176" rx="14" fill="#EFF6FF" stroke="#2563EB" stroke-width="2" />
+  <text x="374" y="226" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="700" fill="#1E3A8A">
+    Average Solution
+  </text>
+  <text x="374" y="264" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14" font-weight="600" fill="#1E293B">
+    AVⱼ = (Σ Xᵢⱼ) / n
+  </text>
+  <line x1="308" y1="286" x2="440" y2="286" stroke="#BFDBFE" stroke-width="1" />
+  <text x="374" y="316" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12.5" font-weight="500" fill="#475569">
+    Multi-Dataset Baseline
+  </text>
+
+  <!-- Arrows 2 -> 3a & 3b -->
+  <path d="M 466 232 L 508 176" fill="none" stroke="#059669" stroke-width="2.4" marker-end="url(#arrow-teal)" />
+  <path d="M 466 296 L 508 352" fill="none" stroke="#DC2626" stroke-width="2.4" marker-end="url(#arrow-red)" />
+
+  <!-- Stage 3a: Positive Distance (PDA) -->
+  <rect x="516" y="114" width="198" height="118" rx="14" fill="#D1FAE5" stroke="#059669" stroke-width="2" />
+  <text x="615" y="156" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="700" fill="#065F46">
+    Positive Distance (PDA)
+  </text>
+  <text x="615" y="186" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5" font-weight="600" fill="#0F172A">
+    max(0, Xᵢⱼ − AVⱼ) / AVⱼ
+  </text>
+  <text x="615" y="212" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" fill="#047857">
+    Weighted Sum SPᵢ → NSPᵢ
+  </text>
+
+  <!-- Stage 3b: Negative Distance (NDA) -->
+  <rect x="516" y="296" width="198" height="118" rx="14" fill="#FEE2E2" stroke="#DC2626" stroke-width="2" />
+  <text x="615" y="338" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="15" font-weight="700" fill="#991B1B">
+    Negative Distance (NDA)
+  </text>
+  <text x="615" y="368" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5" font-weight="600" fill="#0F172A">
+    max(0, AVⱼ − Xᵢⱼ) / AVⱼ
+  </text>
+  <text x="615" y="394" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11.5" fill="#B91C1C">
+    Weighted Sum SNᵢ → NSNᵢ
+  </text>
+
+  <!-- Arrows 3a/3b -> 4 -->
+  <path d="M 714 176 L 750 232" fill="none" stroke="#059669" stroke-width="2.4" marker-end="url(#arrow-teal)" />
+  <path d="M 714 352 L 750 296" fill="none" stroke="#DC2626" stroke-width="2.4" marker-end="url(#arrow-red)" />
+
+  <!-- Stage 4: Appraisal Score -->
+  <rect x="758" y="128" width="164" height="272" rx="14" fill="#0B132B" stroke="#2563EB" stroke-width="2.2" />
+  <text x="840" y="164" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">
+    Appraisal Score
+  </text>
+  <text x="840" y="192" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12" font-weight="600" fill="#93C5FD">
+    ASᵢ = ½(NSPᵢ + NSNᵢ)
+  </text>
+
+  <rect x="774" y="216" width="132" height="32" rx="7" fill="#059669" />
+  <text x="840" y="237" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12" font-weight="700" fill="#FFFFFF">
+    1. Model A: 0.91
+  </text>
+
+  <rect x="774" y="260" width="132" height="32" rx="7" fill="#2563EB" />
+  <text x="840" y="281" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12" font-weight="700" fill="#FFFFFF">
+    2. Model B: 0.74
+  </text>
+
+  <rect x="774" y="304" width="132" height="32" rx="7" fill="#475569" />
+  <text x="840" y="325" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12" font-weight="700" fill="#F8FAFC">
+    3. Model C: 0.52
+  </text>
+
+  <text x="840" y="372" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#CBD5E1">
+    Unified KGC Rank
+  </text>
+
+  <!-- Bottom Caption Bar -->
+  <line x1="40" y1="454" x2="920" y2="454" stroke="#CBD5E1" stroke-width="1" />
+  <text x="480" y="486" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="13.5" font-weight="600" fill="#334155">
+    KG-EDAS synthesizes MRR, Hits@K, and computational cost via Distance from Average Solution into a single unified score.
+  </text>
+</svg>

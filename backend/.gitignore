@@ -1,0 +1,19 @@
+# Environment variables & secrets (Never commit to GitHub)
+.env
+.env.local
+.env.*.local
+*.env
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+
+# Operating System files
+.DS_Store
+Thumbs.db
